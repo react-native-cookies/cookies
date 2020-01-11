@@ -12,8 +12,7 @@
     "url": "git+https://github.com/react-native-community/react-native-cookies.git"
   },
   "keywords": [
-    "react",
-    "native",
+    "react-native",
     "ios",
     "android",
     "cookies"
