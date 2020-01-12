@@ -1,11 +1,11 @@
 {
-  "name": "@react-native-community/react-native-cookies",
-  "version": "0.0.0",
-  "private": false,
+  "name": "react-native-cookies",
+  "version": "1.0.0",
   "description": "Cookie Manager for React Native",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-community/react-native-cookies.git"
+    "url": "git+https://github.com/react-native-community/react-native-cookies.git",
+    "baseUrl": "https://github.com/react-native-community/react-native-cookies"
   },
   "keywords": [
     "react native",
@@ -15,8 +15,13 @@
     "cookies",
     "webview"
   ],
-  "author": "Jason Safaiyeh <safaiyeh@protonmail.com>",
+  "author": {
+    "name": "Jason Safaiyeh",
+    "email": "safaiyeh@protonmail.com"
+  },
   "license": "MIT",
+  "licenseFilename": "LICENSE",
+  "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/react-native-community/react-native-cookies/issues"
   },
