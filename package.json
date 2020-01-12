@@ -3,24 +3,36 @@
   "version": "0.0.0",
   "private": false,
   "description": "Cookie Manager for React Native",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/react-native-community/react-native-cookies.git"
   },
   "keywords": [
+    "react native",
     "react-native",
-    "ios",
     "android",
-    "cookies"
+    "ios",
+    "cookies",
+    "webview"
   ],
   "author": "Jason Safaiyeh <safaiyeh@protonmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/react-native-community/react-native-cookies/issues"
   },
-  "homepage": "https://github.com/react-native-community/react-native-cookies#readme"
+  "homepage": "https://github.com/react-native-community/react-native-cookies#readme",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "invariant": "^2.2.4"
+  },
+  "devDependencies": {
+    "@react-native-community/eslint-config": "^0.0.6",
+    "@semantic-release/git": "^8.0.0",
+    "eslint": "^6.8.0",
+    "semantic-release": "^16.0.1"
+  }
 }
