@@ -8,7 +8,7 @@ Cookie Manager for React Native
 - [x] iOS
 - [x] Android
 
-Currently lacking support for Windows, Web, and Expo. Support for these platforms will created when there is a need for them. Starts with a posted issue.
+Currently lacking support for Windows, Web, and Expo. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
 
 ## Installation
 
@@ -83,7 +83,7 @@ protected List<ReactPackage> getPackages() {
 ## Usage
 
 ```javascript
-import CookieManager from 'react-native-cookie-store';
+import CookieManager from 'react-native-cookies';
 
 // set a cookie (IOS ONLY)
 CookieManager.set({
@@ -154,7 +154,7 @@ To use this _CookieManager_ with WebKit-Support we extended the interface with t
 
 ##### Usage
 ```javascript
-import CookieManager from 'react-native-cookie-store';
+import CookieManager from 'react-native-cookies';
 
 const useWebKit = true;
 
