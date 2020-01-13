@@ -83,7 +83,7 @@ protected List<ReactPackage> getPackages() {
 ## Usage
 
 ```javascript
-import CookieManager from 'react-native-cookies';
+import CookieManager from '@react-native-community/react-native-cookies';
 
 // set a cookie (IOS ONLY)
 CookieManager.set({
@@ -154,7 +154,7 @@ To use this _CookieManager_ with WebKit-Support we extended the interface with t
 
 ##### Usage
 ```javascript
-import CookieManager from 'react-native-cookies';
+import CookieManager from '@react-native-community/react-native-cookies';
 
 const useWebKit = true;
 
