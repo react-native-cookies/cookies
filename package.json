@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/react-native-community/react-native-cookies#readme",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "lint": "eslint index.js",
     "semantic-release": "semantic-release"
