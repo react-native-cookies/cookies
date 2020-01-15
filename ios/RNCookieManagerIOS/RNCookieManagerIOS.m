@@ -51,9 +51,6 @@ RCT_EXPORT_METHOD(
 
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
 
-    NSLog(@"SETTING COOKIE");
-    NSLog(@"%@", cookie);
-
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
@@ -93,7 +90,6 @@ RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url
         for (int i = 0; i < cookies.count; i++) {
             NSHTTPCookie *cookie = [cookies objectAtIndex:i];
             [dics setObject:cookie.value forKey:cookie.name];
-            NSLog(@"cookie: name=%@, value=%@", cookie.name, cookie.value);
             [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
         }
         resolve(dics);
@@ -234,7 +230,6 @@ RCT_EXPORT_METHOD(
 {
     NSMutableDictionary *cookieList = [NSMutableDictionary dictionary];
     for (NSHTTPCookie *cookie in cookies) {
-        // NSLog(@"COOKIE: %@", cookie);
         [cookieList setObject:[self createCookieData:cookie] forKey:cookie.name];
     }
     return cookieList;
