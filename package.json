@@ -1,6 +1,6 @@
 {
   "name": "@react-native-community/react-native-cookies",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cookie Manager for React Native",
   "repository": {
     "type": "git",
