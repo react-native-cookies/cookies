@@ -6,6 +6,7 @@
 #endif
 
 static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
+static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: You may be missing http:// or https:// in your URL.";
 
 @implementation RNCookieManagerIOS
 
@@ -102,6 +103,11 @@ RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url
     NSInteger maxLength = 2;
 
     NSURLComponents *components = [[NSURLComponents alloc]initWithURL:url resolvingAgainstBaseURL:FALSE];
+
+    if ([components.host isEqual: @""] || components.host == nil) {
+        return nil;
+    }
+
     NSArray<NSString *> *separatedHost = [components.host componentsSeparatedByString:separator];
     NSInteger count = [separatedHost count];
     NSInteger endPosition = count;
@@ -125,6 +131,11 @@ RCT_EXPORT_METHOD(
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = [self getDomainName:url];
+
+                if (topLevelDomain == nil) {
+                    reject(@"", INVALID_URL_MISSING_HTTP, nil);
+                    return;
+                }
 
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
