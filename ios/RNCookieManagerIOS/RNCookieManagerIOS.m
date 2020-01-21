@@ -6,7 +6,7 @@
 #endif
 
 static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
-static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: You may be missing http:// or https:// in your URL.";
+static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: It may be missing a protocol (ex. http:// or https://).";
 
 @implementation RNCookieManagerIOS
 
