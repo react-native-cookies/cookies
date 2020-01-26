@@ -4,7 +4,7 @@ Cookie Manager for React Native
 This module was ported from [joeferraro/react-native-cookies](https://github.com/joeferraro/react-native-cookies). This would not exist without the work of the original author, [Joe Ferraro](https://github.com/joeferraro). 
 
 ## Important notices & Breaking Changes
-- v1.1.1 >= will be published to `@react-native-community/cookies`. `@react-native-community/react-native-cookies` is now deprecated as of v1.1.1.
+- **v2.0.0**: Package name updated to `@react-native-community/cookies`.
 
 ## Maintainers
 - [Jason Safaiyeh](https://github.com/safaiyeh) ([Twitter @safaiyeh](https://twitter.com/safaiyeh)) from [Sumo Logic](https://www.sumologic.com)
