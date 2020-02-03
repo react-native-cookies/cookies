@@ -1,9 +1,9 @@
-declare module "@react-native-community/react-native-cookies" {
+declare module '@react-native-community/cookies' {
   export interface Cookie {
     name: string;
     value: string;
+    path: string;
     domain?: string;
-    path?: string;
     origin?: string;
     version?: string;
     expiration?: string;
@@ -20,7 +20,7 @@ declare module "@react-native-community/react-native-cookies" {
 
     // iOS only.
     getAll(
-      useWebKit?: boolean
+      useWebKit?: boolean,
     ): Promise<{
       [key: string]: Cookie;
     }>;
