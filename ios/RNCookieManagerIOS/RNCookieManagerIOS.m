@@ -175,7 +175,7 @@ RCT_EXPORT_METHOD(
                 [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes
                                                         modifiedSince:dateFrom
                                                         completionHandler:^() {
-                                                            resolve(nil);
+                                                            resolve(true);
                                                         }];
             });
         } else {
@@ -186,11 +186,12 @@ RCT_EXPORT_METHOD(
         for (NSHTTPCookie *c in cookieStorage.cookies) {
             [cookieStorage deleteCookie:c];
         }
-        resolve(nil);
+        resolve(true);
     }
 }
 
-RCT_EXPORT_METHOD(clearByName:(NSString *) name
+RCT_EXPORT_METHOD(clearByName:(NSURL *) url,
+    name: (NSString *) name
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
@@ -199,7 +200,7 @@ RCT_EXPORT_METHOD(clearByName:(NSString *) name
         [cookieStorage deleteCookie:c];
       }
     }
-    resolve(nil);
+    resolve(true);
 }
 
 RCT_EXPORT_METHOD(

@@ -104,12 +104,44 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void clearAll(boolean useWebKit, final Promise promise) {
-        this.cookieHandler.clearCookies(new Callback() {
-            public void invoke(Object... args) {
-                promise.resolve(null);
-            }
-        });
+    public void clearByName(String url, String name, final Promise promise) throws Exception{
+        if(url==null){
+            throw new Exception("Cannot remove cookie without domain / url");
+        }
+
+        String cookieString = name + "=''";
+
+        if (USES_LEGACY_STORE) {
+            mCookieManager.setCookie(url, cookieString);
+            mCookieSyncManager.sync();
+            promise.resolve(true);
+        } else {
+            mCookieManager.setCookie(url, cookieString,new ValueCallback<Boolean>() {
+                @Override
+                public void onReceiveValue(Boolean value) {
+                    promise.resolve(value);
+                }
+            });
+            mCookieManager.flush();
+        }
+    }
+
+    @ReactMethod
+    public void clearAll(Boolean useWebKit, final Promise promise) {
+        if (USES_LEGACY_STORE) {
+            mCookieManager.removeAllCookie();
+            mCookieManager.removeSessionCookie();
+            mCookieSyncManager.sync();
+            promise.resolve(true);
+        } else {
+            mCookieManager.removeAllCookies(new ValueCallback<Boolean>() {
+                @Override
+                public void onReceiveValue(Boolean value) {
+                    promise.resolve(value);
+                }
+            });
+            mCookieManager.flush();
+        }
     }
 
     private void addCookies(String url, String cookieString, final Promise promise) {
