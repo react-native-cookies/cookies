@@ -7,19 +7,24 @@
 
 package com.reactnativecommunity.cookies;
 
-import com.facebook.react.modules.network.ForwardingCookieHandler;
+import android.os.Build;
+import android.text.TextUtils;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
+import android.webkit.ValueCallback;
+
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.Promise;
+import com.facebook.react.modules.network.ForwardingCookieHandler;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +32,18 @@ import java.util.Map;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
+    private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < 21;
+
     private ForwardingCookieHandler cookieHandler;
 
-    public CookieManagerModule(ReactApplicationContext context) {
+    private CookieManager mCookieManager;
+    private CookieSyncManager mCookieSyncManager;
+
+    CookieManagerModule(ReactApplicationContext context) {
         super(context);
-        this.cookieHandler = new ForwardingCookieHandler(context);
+        this.mCookieSyncManager = CookieSyncManager.createInstance(context);
+        this.mCookieManager = CookieManager.getInstance();
+        mCookieManager.setAcceptCookie(true);
     }
 
     public String getName() {
@@ -39,22 +51,26 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void set(ReadableMap cookie, boolean useWebKit, final Promise promise) throws Exception {
-        throw new Exception("Cannot call on android, try setFromResponse");
+    public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) throws Exception {
+        String cookieString = makeCookieString(cookie);
+
+        if (cookieString == null) {
+            throw new Exception("Unable to add cookie - invalid values");
+        }
+
+        addCookies(url, cookieString, promise);
     }
 
     @ReactMethod
-    public void setFromResponse(String url, String value, final Promise promise) throws URISyntaxException, IOException {
-        Map headers = new HashMap<String, List<String>>();
-        // Pretend this is a header
-        headers.put("Set-Cookie", Collections.singletonList(value));
-        URI uri = new URI(url);
-        try {
-            this.cookieHandler.put(uri, headers);
-            promise.resolve(true);
-        } catch (IOException e) {
-            promise.resolve(false);
+    public void setFromResponse(String url, ReadableMap cookie, final Promise promise)
+            throws URISyntaxException, IOException, Exception {
+        String cookieString = makeCookieString(cookie);
+
+        if (cookieString == null) {
+            throw new Exception("Unable to add cookie - invalid values");
         }
+
+        addCookies(url, cookieString, promise);
     }
 
     @ReactMethod
@@ -94,5 +110,24 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 promise.resolve(null);
             }
         });
+    }
+
+    private void addCookies(String url, String cookieString, final Promise promise) {
+        if (USES_LEGACY_STORE) {
+            mCookieManager.setCookie(url, cookieString);
+            mCookieSyncManager.sync();
+            promise.resolve(true);
+        } else {
+            mCookieManager.setCookie(url, cookieString, new ValueCallback<Boolean>() {
+                @Override
+                public void onReceiveValue(Boolean value) {
+                    promise.resolve(value);
+                }
+            });
+        }
+    }
+
+    private String makeCookieString(ReadableMap cookie) {
+        return null;
     }
 }

@@ -42,7 +42,8 @@ static inline BOOL isEmpty(id value)
 RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(
-    set:(NSDictionary *)props
+    set:(NSURL *)url
+    cookie: NSDictionary *)props
     useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
@@ -78,25 +79,27 @@ RCT_EXPORT_METHOD(
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
-                [cookieStore setCookie:cookie completionHandler:nil];
-                resolve(nil);
+                [cookieStore setCookie:cookie completionHandler:^() {
+                    resolve(true);
+                }];
             });
         } else {
             reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
         }
     } else {
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
-        resolve(nil);
+        resolve(true);
     }
 }
 
 RCT_EXPORT_METHOD(setFromResponse:(NSURL *)url
-    value:(NSString *)value
+    cookie: NSDictionary *)props
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
+
     NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{@"Set-Cookie": value} forURL:url];
     [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:nil];
-    resolve(nil);
+    resolve(true);
 }
 
 RCT_EXPORT_METHOD(getFromResponse:(NSURL *)url
