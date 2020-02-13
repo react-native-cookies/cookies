@@ -19,7 +19,6 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.network.ForwardingCookieHandler;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,8 +34,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     private CookieManager mCookieManager;
     private CookieSyncManager mCookieSyncManager;
-
-    ForwardingCookieHandler handler;
 
     CookieManagerModule(ReactApplicationContext context) {
         super(context);
@@ -61,14 +58,12 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setFromResponse(String url, ReadableMap cookie, final Promise promise) {
-        String cookieString = makeCookieString(cookie);
-
-        if (cookieString == null) {
+    public void setFromResponse(String url, String cookie, final Promise promise) {
+        if (cookie == null) {
             promise.reject(new Exception("Unable to add cookie - invalid values"));
         }
 
-        addCookies(url, cookieString, promise);
+        addCookies(url, cookie, promise);
     }
 
     @ReactMethod
@@ -194,17 +189,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         } catch (Exception ignored) {
 
         }
-        Cookie.Builder cookieBuilder = new Cookie.Builder()
-                .name(cookie.getString("name"))
+        Cookie.Builder cookieBuilder = new Cookie.Builder().name(cookie.getString("name"))
                 .value(cookie.getString("value"));
 
-        if (cookie.hasKey("domain") && cookie.getString("domain") != null
-                && !cookie.getString("domain").isEmpty()) {
+        if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
             cookieBuilder.domain(cookie.getString("domain"));
         }
 
-        if (cookie.hasKey("path") && cookie.getString("path") != null
-                && !cookie.getString("path").isEmpty()) {
+        if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
             cookieBuilder.path(cookie.getString("path"));
         }
 
