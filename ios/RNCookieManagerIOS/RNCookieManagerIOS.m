@@ -122,7 +122,9 @@ RCT_EXPORT_METHOD(
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
                     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
                     for (NSHTTPCookie *cookie in allCookies) {
-                        if ([topLevelDomain containsString:cookie.domain]) {
+                        if ([topLevelDomain containsString:cookie.domain] ||
+                            [cookie.domain containsString: topLevelDomain] ||
+                            [cookie.domain isEqualToString: topLevelDomain]) {
                             [cookies setObject:[self createCookieData:cookie] forKey:cookie.name];
                         }
                     }
