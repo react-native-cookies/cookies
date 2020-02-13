@@ -182,25 +182,34 @@ RCT_EXPORT_METHOD(
     NSMutableArray<NSHTTPCookie *> * foundCookiesList = [NSMutableArray new];
     
     if (useWebKit) {
-           if (@available(iOS 11.0, *)) {
-               dispatch_async(dispatch_get_main_queue(), ^(){
-                   __block WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
-                   [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
-                        for (NSHTTPCookie *cookie in allCookies) {
-                            if ([[cookie name] isEqualToString:name]) {
-                                [foundCookiesList addObject:cookie];
-                                foundCookies = @YES;
-                            }
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                NSString *topLevelDomain = url.host;
+
+                if (topLevelDomain == nil) {
+                    reject(@"", INVALID_URL_MISSING_HTTP, nil);
+                    return;
+                }
+
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
+                    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
+                    for (NSHTTPCookie *cookie in allCookies) {
+                        NSLog(@"Cookie names: %@", cookie.name);
+                        if ([name isEqualToString:cookie.name]) {
+                             [foundCookiesList addObject:cookie];
+                             foundCookies = @YES;
                         }
-                   }];
-                  for (NSHTTPCookie *cookie in foundCookiesList) {
-                      [cookieStore deleteCookie:cookie completionHandler:nil];
-                  }
-                  resolve(foundCookies);
-               });
-           } else {
-               reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
-           }
+                    }
+                    for (NSHTTPCookie *fCookie in foundCookiesList) {
+                        [cookieStore deleteCookie:fCookie completionHandler:nil];
+                    }
+                    resolve(foundCookies);
+                }];
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
     } else {
            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
            for (NSHTTPCookie *c in cookieStorage.cookies) {
