@@ -19,9 +19,15 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.network.ForwardingCookieHandler;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
@@ -29,6 +35,8 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     private CookieManager mCookieManager;
     private CookieSyncManager mCookieSyncManager;
+
+    ForwardingCookieHandler handler;
 
     CookieManagerModule(ReactApplicationContext context) {
         super(context);
@@ -69,32 +77,22 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getAll(boolean useWebKit, Promise promise) throws Exception {
-        throw new Exception("Cannot get all cookies on android, try getCookieHeader(url)");
-    }
-
-    @ReactMethod
-    public void get(String url, boolean useWebKit, Promise promise) throws URISyntaxException, IOException {
-        URI uri = new URI(url);
-
-        Map<String, List<String>> cookieMap = this.cookieHandler.get(uri, new HashMap());
-        // If only the variables were public
-        List<String> cookieList = cookieMap.get("Cookie");
-        WritableMap map = Arguments.createMap();
-        if (cookieList != null) {
-            String[] cookies = cookieList.get(0).split(";");
-            for (int i = 0; i < cookies.length; i++) {
-                String[] cookie = cookies[i].split("=", 2);
-                if (cookie.length > 1) {
-                  map.putString(cookie[0].trim(), cookie[1]);
-                }
-            }
+    public void get(String url, Boolean useWebKit, Promise promise) {
+        try {
+            WritableMap cookieMap = getCookies(url);
+            promise.resolve(cookieMap);
+        } catch (Exception e) {
+            promise.reject(e);
         }
-        promise.resolve(map);
     }
 
     @ReactMethod
-    public void clearByName(String url, String name, final Promise promise) {
+    public void getAll(Boolean useWebKit, Promise promise) {
+        promise.reject(new Exception("Cannot get all available cookies in store for Android"));
+    }
+
+    @ReactMethod
+    public void clearByName(String url, String name, Boolean useWebKit, final Promise promise) {
         if (url == null) {
             promise.reject(new Exception("Cannot remove cookie without domain / url"));
         }
@@ -153,7 +151,64 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         }
     }
 
+    private WritableMap getCookies(String url) throws Exception {
+        if (url == null || url.equals("")) {
+            throw new Exception("Cannot get cookies without a url");
+        }
+
+        WritableMap allCookiesMap = Arguments.createMap();
+
+        String cookiesString = mCookieManager.getCookie(url);
+        if (cookiesString != null && !cookiesString.equals("")) {
+            String[] cookieHeaders = cookiesString.split(";");
+            HttpUrl httpUrl = HttpUrl.parse(url);
+            if (httpUrl != null) {
+                for (String cookieString : cookieHeaders) {
+                    Cookie cookie = Cookie.parse(httpUrl, cookieString);
+                    if (cookie != null) {
+                        WritableMap cookieMap = Arguments.createMap();
+                        cookieMap.putString("name", cookie.name());
+                        cookieMap.putString("value", cookie.value());
+                        cookieMap.putString("domain", cookie.domain());
+                        cookieMap.putString("path", cookie.path());
+                        cookieMap.putString("origin", url);
+                        // no version unavailable from this interface
+                        // cookieMap.putInt("version", cookie.getVersion());
+
+                        cookieMap.putString("expiration", new Date(cookie.expiresAt()).toString());
+
+                        allCookiesMap.putMap(cookie.name(), cookieMap);
+                    }
+                }
+            }
+        }
+        return allCookiesMap;
+    }
+
     private String makeCookieString(ReadableMap cookie) {
-        return null;
+        Date date = null;
+        try {
+            date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
+        } catch (Exception ignored) {
+
+        }
+        Cookie.Builder cookieBuilder = new Cookie.Builder()
+                .name(cookie.getString("name"))
+                .value(cookie.getString("value"));
+
+        if (cookie.hasKey("path") && cookie.getBoolean("secure")) {
+            cookieBuilder.secure();
+        }
+
+        if (cookie.hasKey("domain") && cookie.getString("domain") != null
+                && !cookie.getString("domain").isEmpty()) {
+            cookieBuilder.domain(cookie.getString("domain"));
+        }
+
+        if (date != null) {
+            cookieBuilder.expiresAt(date.getTime());
+        }
+
+        return cookieBuilder.build().toString();
     }
 }
