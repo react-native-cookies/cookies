@@ -72,6 +72,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void getAll(Boolean useWebKit, Promise promise) {
+        promise.reject(new Exception("Cannot get all available cookies in store for Android"));
+    }
+
+    @ReactMethod
     public void get(String url, Boolean useWebKit, Promise promise) {
         try {
             WritableMap cookieMap = getCookies(url);
@@ -79,11 +84,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.reject(e);
         }
-    }
-
-    @ReactMethod
-    public void getAll(Boolean useWebKit, Promise promise) {
-        promise.reject(new Exception("Cannot get all available cookies in store for Android"));
     }
 
     @ReactMethod
