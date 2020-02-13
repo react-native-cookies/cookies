@@ -48,32 +48,8 @@ RCT_EXPORT_METHOD(
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSString *name = [RCTConvert NSString:props[@"name"]];
-    NSString *value = [RCTConvert NSString:props[@"value"]];
-    NSString *path = [RCTConvert NSString:props[@"path"]];
-    NSString *domain = [RCTConvert NSString:props[@"domain"]];
-    NSString *origin = [RCTConvert NSString:props[@"origin"]];
-    NSString *version = [RCTConvert NSString:props[@"version"]];
-    NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
-
-    NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
-    [cookieProperties setObject:name forKey:NSHTTPCookieName];
-    [cookieProperties setObject:value forKey:NSHTTPCookieValue];
-    [cookieProperties setObject:path forKey:NSHTTPCookiePath];
-    if (!isEmpty(domain)) {
-        [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
-    }
-    if (!isEmpty(origin)) {
-        [cookieProperties setObject:origin forKey:NSHTTPCookieOriginURL];
-    }
-    if (!isEmpty(version)) {
-         [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
-    }
-    if (!isEmpty(expiration)) {
-         [cookieProperties setObject:expiration forKey:NSHTTPCookieExpires];
-    }
-
-    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
+    
+    NSHTTPCookie *cookie = [self makeHTTPCookieObject:props];
 
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
@@ -244,6 +220,48 @@ RCT_EXPORT_METHOD(
     return nil;  
 }
 
+-(NSHTTPCookie *)makeHTTPCookieObject:(NSDictionary *)props
+{
+    NSString *name = [RCTConvert NSString:props[@"name"]];
+    NSString *value = [RCTConvert NSString:props[@"value"]];
+    NSString *path = [RCTConvert NSString:props[@"path"]];
+    NSString *domain = [RCTConvert NSString:props[@"domain"]];
+    NSString *origin = [RCTConvert NSString:props[@"origin"]];
+    NSString *version = [RCTConvert NSString:props[@"version"]];
+    NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
+    NSNumber *secure = [RCTConvert NSNumber:props[@"secure"]];
+    NSNumber *httpOnly = [RCTConvert NSNumber:props[@"httpOnly"]];
+
+    NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
+    [cookieProperties setObject:name forKey:NSHTTPCookieName];
+    [cookieProperties setObject:value forKey:NSHTTPCookieValue];
+    if (!isEmpty(path)) {
+        [cookieProperties setObject:path forKey:NSHTTPCookiePath];
+    }
+    if (!isEmpty(domain)) {
+        [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
+    }
+    if (!isEmpty(origin)) {
+        [cookieProperties setObject:origin forKey:NSHTTPCookieOriginURL];
+    }
+    if (!isEmpty(version)) {
+         [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
+    }
+    if (!isEmpty(expiration)) {
+         [cookieProperties setObject:expiration forKey:NSHTTPCookieExpires];
+    }
+    if (!isEmpty(secure)) {
+        [cookieProperties setObject:secure forKey:@"secure"];     
+    }
+    if (!isEmpty(httpOnly)) {
+        [cookieProperties setObject:httpOnly forKey:@"HTTPOnly"];     
+    }
+
+    NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
+
+    return cookie;
+}
+
 -(NSDictionary *)createCookieData:(NSHTTPCookie *)cookie
 {
     NSMutableDictionary *cookieData = [NSMutableDictionary dictionary];
@@ -255,6 +273,8 @@ RCT_EXPORT_METHOD(
     if (!isEmpty(cookie.expiresDate)) {
         [cookieData setObject:[self.formatter stringFromDate:cookie.expiresDate] forKey:@"expiration"];
     }
+    [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.secure] forKey:@"secure"];
+    [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.HTTPOnly] forKey:@"httpOnly"];
     return cookieData;
 }
 
