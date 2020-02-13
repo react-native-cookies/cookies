@@ -173,15 +173,42 @@ RCT_EXPORT_METHOD(
 RCT_EXPORT_METHOD(
     clearByName:(NSURL *) url
     name:(NSString *) name
+    useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
-    NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-    for (NSHTTPCookie *c in cookieStorage.cookies) {
-      if ([[c name] isEqualToString:name]) {
-        [cookieStorage deleteCookie:c];
-      }
+    __block NSNumber * foundCookies = @NO;
+    NSMutableArray<NSHTTPCookie *> * foundCookiesList = [NSMutableArray new];
+    
+    if (useWebKit) {
+           if (@available(iOS 11.0, *)) {
+               dispatch_async(dispatch_get_main_queue(), ^(){
+                   __block WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                   [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
+                        for (NSHTTPCookie *cookie in allCookies) {
+                            if ([[cookie name] isEqualToString:name]) {
+                                [foundCookiesList addObject:cookie];
+                                foundCookies = @YES;
+                            }
+                        }
+                   }];
+                  for (NSHTTPCookie *cookie in foundCookiesList) {
+                      [cookieStore deleteCookie:cookie completionHandler:nil];
+                  }
+                  resolve(foundCookies);
+               });
+           } else {
+               reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+           }
+    } else {
+           NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+           for (NSHTTPCookie *c in cookieStorage.cookies) {
+               if ([[c name] isEqualToString:name]) {
+                   [cookieStorage deleteCookie:c];
+                   foundCookies = @YES;
+               }
+           }
+           resolve(foundCookies);
     }
-    resolve(@(YES));
 }
 
 RCT_EXPORT_METHOD(

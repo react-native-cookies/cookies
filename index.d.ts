@@ -22,7 +22,7 @@ declare module '@react-native-community/cookies' {
     get(url: string, useWebKit?: boolean): Promise<Cookies>;
     getFromResponse(url: string): Promise<Cookies>;
 
-    clearByName(url: string, name: string): Promise<boolean>;
+    clearByName(url: string, name: string, useWebKit?: boolean): Promise<boolean>;
     clearAll(useWebKit?: boolean): Promise<boolean>;
 
     //iOS only
