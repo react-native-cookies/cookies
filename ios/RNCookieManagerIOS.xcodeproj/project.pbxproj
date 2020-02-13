@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1BD726021CF77DD1005DBD79 /* RNCookieManagerIOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BD726011CF77DD1005DBD79 /* RNCookieManagerIOS.m */; };
+		A2387BE556B46F28BB9C62FD /* Pods_RNCookieManagerIOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A3E91C9DB889DAEAB299FB5 /* Pods_RNCookieManagerIOS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,6 +27,9 @@
 		1BD725DA1CF77A8B005DBD79 /* libRNCookieManagerIOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCookieManagerIOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BD726001CF77DD1005DBD79 /* RNCookieManagerIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCookieManagerIOS.h; sourceTree = "<group>"; };
 		1BD726011CF77DD1005DBD79 /* RNCookieManagerIOS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCookieManagerIOS.m; sourceTree = "<group>"; };
+		6CDA467A38779CEFE54AF652 /* Pods-RNCookieManagerIOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNCookieManagerIOS.debug.xcconfig"; path = "Target Support Files/Pods-RNCookieManagerIOS/Pods-RNCookieManagerIOS.debug.xcconfig"; sourceTree = "<group>"; };
+		7A3E91C9DB889DAEAB299FB5 /* Pods_RNCookieManagerIOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RNCookieManagerIOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC0CCEFD0D5DDBC08A3F9FDB /* Pods-RNCookieManagerIOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNCookieManagerIOS.release.xcconfig"; path = "Target Support Files/Pods-RNCookieManagerIOS/Pods-RNCookieManagerIOS.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,17 +37,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2387BE556B46F28BB9C62FD /* Pods_RNCookieManagerIOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1ABCC227200901826854EA3A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7A3E91C9DB889DAEAB299FB5 /* Pods_RNCookieManagerIOS.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		1BD725CD1CF7795C005DBD79 = {
 			isa = PBXGroup;
 			children = (
 				1BD725FF1CF77DD1005DBD79 /* RNCookieManagerIOS */,
 				1BD725DB1CF77A8B005DBD79 /* Products */,
+				71405C5FF90D2ACAB4F0366B /* Pods */,
+				1ABCC227200901826854EA3A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +79,15 @@
 			path = RNCookieManagerIOS;
 			sourceTree = "<group>";
 		};
+		71405C5FF90D2ACAB4F0366B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6CDA467A38779CEFE54AF652 /* Pods-RNCookieManagerIOS.debug.xcconfig */,
+				AC0CCEFD0D5DDBC08A3F9FDB /* Pods-RNCookieManagerIOS.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -71,6 +95,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1BD725E31CF77A8B005DBD79 /* Build configuration list for PBXNativeTarget "RNCookieManagerIOS" */;
 			buildPhases = (
+				749140BD317DEE62C1AE6F51 /* [CP] Check Pods Manifest.lock */,
 				1BD725D61CF77A8B005DBD79 /* Sources */,
 				1BD725D71CF77A8B005DBD79 /* Frameworks */,
 				1BD725D81CF77A8B005DBD79 /* CopyFiles */,
@@ -90,7 +115,7 @@
 		1BD725CE1CF7795C005DBD79 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					1BD725D91CF77A8B005DBD79 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -102,6 +127,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 1BD725CD1CF7795C005DBD79;
@@ -113,6 +139,31 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		749140BD317DEE62C1AE6F51 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RNCookieManagerIOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1BD725D61CF77A8B005DBD79 /* Sources */ = {
@@ -129,17 +180,72 @@
 		1BD725D21CF7795C005DBD79 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
 		};
 		1BD725D31CF7795C005DBD79 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
 			};
 			name = Release;
 		};
 		1BD725E11CF77A8B005DBD79 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6CDA467A38779CEFE54AF652 /* Pods-RNCookieManagerIOS.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -201,6 +307,7 @@
 		};
 		1BD725E21CF77A8B005DBD79 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AC0CCEFD0D5DDBC08A3F9FDB /* Pods-RNCookieManagerIOS.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -273,6 +380,7 @@
 				1BD725E21CF77A8B005DBD79 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
