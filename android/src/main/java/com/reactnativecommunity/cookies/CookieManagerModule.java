@@ -198,13 +198,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 .name(cookie.getString("name"))
                 .value(cookie.getString("value"));
 
-        if (cookie.hasKey("path") && cookie.getBoolean("secure")) {
-            cookieBuilder.secure();
-        }
-
         if (cookie.hasKey("domain") && cookie.getString("domain") != null
                 && !cookie.getString("domain").isEmpty()) {
             cookieBuilder.domain(cookie.getString("domain"));
+        }
+
+        if (cookie.hasKey("path") && cookie.getString("path") != null
+                && !cookie.getString("path").isEmpty()) {
+            cookieBuilder.path(cookie.getString("path"));
         }
 
         if (date != null) {
