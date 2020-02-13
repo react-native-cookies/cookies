@@ -12,8 +12,9 @@ This module was ported from [joeferraro/react-native-cookies](https://github.com
 ## Platforms Supported
 - [x] iOS
 - [x] Android
+- []  Expo (https://github.com/react-native-community/cookies/issues/17)
 
-Currently lacking support for Windows, Web, and Expo. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
+Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
 
 ## Installation
 
