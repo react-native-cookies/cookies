@@ -149,7 +149,7 @@ To use this it's required to use a special implementation of the WebView compone
 
 This special implementation of the WebView component stores the cookies __not__ in `NSHTTPCookieStorage` anymore. The new cookie-storage is `WKHTTPCookieStore` and implementes a differnt interface.
 
-To use this _CookieManager_ with WebKit-Support we extended the interface with the attribute `useWebKit` (a boolean value, default: `FASLE`) for the following methods:
+To use this _CookieManager_ with WebKit-Support we extended the interface with the attribute `useWebKit` (a boolean value, default: `FALSE`) for the following methods:
 
 |Method|WebKit-Support|Method-Signature|
 |---|---|---|
