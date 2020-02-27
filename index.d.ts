@@ -12,7 +12,7 @@ declare module '@react-native-community/cookies' {
   }
 
   export interface Cookies {
-    [key: string]: string;
+    [key: string]: Cookie;
   }
 
   interface CookieManagerStatic {
