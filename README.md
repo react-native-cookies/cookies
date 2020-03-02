@@ -84,15 +84,33 @@ protected List<ReactPackage> getPackages() {
 }
 ```
 
-
-
 ## Usage
+
+A cookie object can have one of the following fields: 
+
+```javascript 
+  export interface Cookie {
+    name: string;
+    value: string;
+    path?: string;
+    domain?: string;
+    origin?: string;
+    version?: string;
+    expiration?: string;
+    secure?: boolean;
+    httpOnly?: boolean;
+  }
+
+  export interface Cookies {
+    [key: string]: Cookie;
+  }
+```
 
 ```javascript
 import CookieManager from '@react-native-community/cookies';
 
-// set a cookie (IOS ONLY)
-CookieManager.set({
+// set a cookie 
+CookieManager.set('http://example.com', {
   name: 'myCookie',
   value: 'myValue',
   domain: 'some domain',
@@ -100,8 +118,8 @@ CookieManager.set({
   path: '/',
   version: '1',
   expiration: '2015-05-30T12:30:00.00-05:00'
-}).then((res) => {
-  console.log('CookieManager.set =>', res);
+}).then((done) => {
+  console.log('CookieManager.set =>', done);
 });
 
 // Set cookies from a response header
@@ -110,36 +128,33 @@ CookieManager.set({
 CookieManager.setFromResponse(
   'http://example.com', 
   'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly')
-    .then((res) => {
-      // `res` will be true or false depending on success.
-      console.log('CookieManager.setFromResponse =>', res);
+    .then((success) => {
+      console.log('CookieManager.setFromResponse =>', success);
     });
 
-// Get cookies as a request header string
+// Get cookies for a url
 CookieManager.get('http://example.com')
-  .then((res) => {
-    console.log('CookieManager.get =>', res); // => 'user_session=abcdefg; path=/;'
+  .then((cookies) => {
+    console.log('CookieManager.get =>', cookies); 
   });
 
 // list cookies (IOS ONLY)
-// useWebKit: boolean
-CookieManager.getAll(useWebKit)
-  .then((res) => {
-    console.log('CookieManager.getAll =>', res);
+CookieManager.getAll()
+  .then((cookies) => {
+    console.log('CookieManager.getAll =>', cookies);
   });
 
 // clear cookies
 CookieManager.clearAll()
-  .then((res) => {
-    console.log('CookieManager.clearAll =>', res);
+  .then((success) => {
+    console.log('CookieManager.clearAll =>', success);
   });
 
 // clear a specific cookie by its name (IOS ONLY)
-CookieManager.clearByName('cookie_name')
-  .then((res) => {
-    console.log('CookieManager.clearByName =>', res);
+CookieManager.clearByName('http://example.com', 'cookie_name')
+  .then((success) => {
+    console.log('CookieManager.clearByName =>', success);
   });
-
 ```
 
 ### WebKit-Support (iOS only)
@@ -155,8 +170,9 @@ To use this _CookieManager_ with WebKit-Support we extended the interface with t
 |---|---|---|
 |getAll| Yes | `CookieManager.getAll(useWebKit:boolean)` |
 |clearAll| Yes | `CookieManager.clearAll(useWebKit:boolean)` |
+|clearByName| Yes | `CookieManager.clearByName(url:string, name: string, useWebKit:boolean)` |
 |get| Yes | `CookieManager.get(url:string, useWebKit:boolean)` |
-|set| Yes | `CookieManager.set(cookie:object, useWebKit:boolean)` |
+|set| Yes | `CookieManager.set(url:string, cookie:object, useWebKit:boolean)` |
 
 ##### Usage
 ```javascript
@@ -166,21 +182,26 @@ const useWebKit = true;
 
 // list cookies (IOS ONLY)
 CookieManager.getAll(useWebKit)
-	.then((res) => {
-		console.log('CookieManager.getAll from webkit-view =>', res);
+	.then((cookies) => {
+		console.log('CookieManager.getAll from webkit-view =>', cookies);
 	});
 
 // clear cookies
 CookieManager.clearAll(useWebKit)
-	.then((res) => {
-		console.log('CookieManager.clearAll from webkit-view =>', res);
+	.then((succcess) => {
+		console.log('CookieManager.clearAll from webkit-view =>', succcess);
 	});
 
+// clear cookies with name
+CookieManager.clearByName('http://example.com', 'cookie name', useWebKit)
+	.then((succcess) => {
+		console.log('CookieManager.clearByName from webkit-view =>', succcess);
+  });
+  
 // Get cookies as a request header string
 CookieManager.get('http://example.com', useWebKit)
-	.then((res) => {
-		console.log('CookieManager.get from webkit-view =>', res);
-		// => 'user_session=abcdefg; path=/;'
+	.then((cookies) => {
+		console.log('CookieManager.get from webkit-view =>', cookies);
 	});
 
 // set a cookie (IOS ONLY)
@@ -194,7 +215,7 @@ const newCookie: = {
 	expiration: '2015-05-30T12:30:00.00-05:00'
 };
 
-CookieManager.set(newCookie, useWebKit)
+CookieManager.set('http://example.com', newCookie, useWebKit)
 	.then((res) => {
 		console.log('CookieManager.set from webkit-view =>', res);
 	});
