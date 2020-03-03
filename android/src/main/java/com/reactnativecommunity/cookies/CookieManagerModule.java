@@ -22,6 +22,7 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -48,7 +49,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) {
-        String cookieString = makeCookieString(cookie);
+        String cookieString = makeCookieString(url, cookie);
 
         if (cookieString == null) {
             promise.reject(new Exception("Unable to add cookie - invalid values"));
@@ -182,18 +183,32 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return allCookiesMap;
     }
 
-    private String makeCookieString(ReadableMap cookie) {
+    private String makeCookieString(String url, ReadableMap cookie) {
         Date date = null;
         try {
             date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
         } catch (Exception ignored) {
 
         }
+
+        String extractedDomain = null;
+        try {
+            URL parsedUrl = new URL(url);
+            extractedDomain = parsedUrl.getHost();
+        } catch (Exception e) {
+
+        }
+
         Cookie.Builder cookieBuilder = new Cookie.Builder().name(cookie.getString("name"))
                 .value(cookie.getString("value"));
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
             cookieBuilder.domain(cookie.getString("domain"));
+        } else if (extractedDomain !=null && !extractedDomain.isEmpty()){
+            cookieBuilder.domain(extractedDomain);
+        } else {
+            // assume something went terribly wrong here and no cookie can be created
+            return null;
         }
 
         if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
