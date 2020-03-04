@@ -49,7 +49,7 @@ RCT_EXPORT_METHOD(
     rejecter:(RCTPromiseRejectBlock)reject)
 {
     
-    NSHTTPCookie *cookie = [self makeHTTPCookieObject:props];
+    NSHTTPCookie *cookie = [self makeHTTPCookieObject:url props:props];
 
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
@@ -256,7 +256,8 @@ RCT_EXPORT_METHOD(
     return nil;  
 }
 
--(NSHTTPCookie *)makeHTTPCookieObject:(NSDictionary *)props
+-(NSHTTPCookie *)makeHTTPCookieObject:(NSURL *) url
+    props: (NSDictionary *)props)
 {
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
@@ -276,6 +277,8 @@ RCT_EXPORT_METHOD(
     }
     if (!isEmpty(domain)) {
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
+    } else {
+        [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];
     }
     if (!isEmpty(origin)) {
         [cookieProperties setObject:origin forKey:NSHTTPCookieOriginURL];
