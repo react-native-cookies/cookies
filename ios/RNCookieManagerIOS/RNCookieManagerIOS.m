@@ -274,6 +274,8 @@ RCT_EXPORT_METHOD(
     [cookieProperties setObject:value forKey:NSHTTPCookieValue];
     if (!isEmpty(path)) {
         [cookieProperties setObject:path forKey:NSHTTPCookiePath];
+    } else {
+        [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
     }
     if (!isEmpty(domain)) {
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
