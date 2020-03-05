@@ -167,7 +167,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                         cookieMap.putString("value", cookie.value());
                         cookieMap.putString("domain", cookie.domain());
                         cookieMap.putString("path", cookie.path());
-                        cookieMap.putString("origin", url);
                         // no version unavailable from this interface
                         // cookieMap.putInt("version", cookie.getVersion());
                         cookieMap.putBoolean("secure", cookie.secure());
@@ -204,7 +203,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
             cookieBuilder.domain(cookie.getString("domain"));
-        } else if (extractedDomain !=null && !extractedDomain.isEmpty()){
+        } else if (extractedDomain != null && !extractedDomain.isEmpty()) {
             cookieBuilder.domain(extractedDomain);
         } else {
             // assume something went terribly wrong here and no cookie can be created
@@ -214,6 +213,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
             cookieBuilder.path(cookie.getString("path"));
         }
+        // unlike iOS, Android will handle no path gracefully and assume "/""
 
         if (date != null) {
             cookieBuilder.expiresAt(date.getTime());

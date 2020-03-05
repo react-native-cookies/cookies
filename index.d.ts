@@ -4,7 +4,6 @@ declare module '@react-native-community/cookies' {
     value: string;
     path?: string;
     domain?: string;
-    origin?: string;
     version?: string;
     expiration?: string;
     secure?: boolean;

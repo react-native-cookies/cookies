@@ -262,7 +262,6 @@ RCT_EXPORT_METHOD(
     NSString *value = [RCTConvert NSString:props[@"value"]];
     NSString *path = [RCTConvert NSString:props[@"path"]];
     NSString *domain = [RCTConvert NSString:props[@"domain"]];
-    NSString *origin = [RCTConvert NSString:props[@"origin"]];
     NSString *version = [RCTConvert NSString:props[@"version"]];
     NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
     NSNumber *secure = [RCTConvert NSNumber:props[@"secure"]];
@@ -280,9 +279,6 @@ RCT_EXPORT_METHOD(
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
     } else {
         [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];
-    }
-    if (!isEmpty(origin)) {
-        [cookieProperties setObject:origin forKey:NSHTTPCookieOriginURL];
     }
     if (!isEmpty(version)) {
          [cookieProperties setObject:version forKey:NSHTTPCookieVersion];

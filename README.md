@@ -93,9 +93,8 @@ A cookie object can have one of the following fields:
     name: string;
     value: string;
     path?: string;
-    domain?: string;
-    origin?: string;
-    version?: string;
+    domain?: string; //if no domain specified, an url host will be used at set time
+    version?: string; //if no path specified, an empty path will be assumed
     expiration?: string;
     secure?: boolean;
     httpOnly?: boolean;
@@ -114,13 +113,15 @@ CookieManager.set('http://example.com', {
   name: 'myCookie',
   value: 'myValue',
   domain: 'some domain',
-  origin: 'some origin',
   path: '/',
   version: '1',
   expiration: '2015-05-30T12:30:00.00-05:00'
 }).then((done) => {
   console.log('CookieManager.set =>', done);
 });
+
+*NB:* When no `domain` is specified, url host will be used instead. Domains starting with a dot e.g. `.example.com` will set the cookie for `http://example.com` or `http://something.example.com` or even `http://something.something.example.com`. In the majority of cases domains starting with a dot are a safer bet to ensure iOS takes them in correctly. 
+*NB:* When no `path` is specified, an empty path `/` will be assumed.
 
 // Set cookies from a response header
 // This allows you to put the full string provided by a server's Set-Cookie 
@@ -160,9 +161,11 @@ CookieManager.clearByName('http://example.com', 'cookie_name')
 ### WebKit-Support (iOS only)
 React Native comes with a WebView component, which uses UIWebView on iOS. Introduced in iOS 8 Apple implemented the WebKit-Support with all the performance boost. 
 
-To use this it's required to use a special implementation of the WebView component (e.g. [react-native-wkwebview](https://github.com/CRAlpha/react-native-wkwebview)).
+Prior to WebKit-Support, cookies would have been stored in `NSHTTPCookieStorage` and sharedCookiesEnabled must be set on webviews to ensure access to them. 
 
-This special implementation of the WebView component stores the cookies __not__ in `NSHTTPCookieStorage` anymore. The new cookie-storage is `WKHTTPCookieStore` and implementes a differnt interface.
+With WebKit-Support, cookies are stored in a separate webview store `WKHTTPCookieStore` and not necessarily shared with other http requests. Caveat is that this store is available upon mounting the component but not necessarily prior so any attempts to set a cookie too early may result in a false positive.
+
+To use WebKit-Support, you should be able to simply make advantage of the react-native-webview as is OR alternatively use the webview component like [react-native-wkwebview](https://github.com/CRAlpha/react-native-wkwebview).
 
 To use this _CookieManager_ with WebKit-Support we extended the interface with the attribute `useWebKit` (a boolean value, default: `FALSE`) for the following methods:
 
@@ -204,12 +207,11 @@ CookieManager.get('http://example.com', useWebKit)
 		console.log('CookieManager.get from webkit-view =>', cookies);
 	});
 
-// set a cookie (IOS ONLY)
+// set a cookie 
 const newCookie: = {
 	name: 'myCookie',
 	value: 'myValue',
 	domain: 'some domain',
-	origin: 'some origin',
 	path: '/',
 	version: '1',
 	expiration: '2015-05-30T12:30:00.00-05:00'
