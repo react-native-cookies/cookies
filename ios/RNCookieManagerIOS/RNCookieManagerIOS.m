@@ -101,7 +101,7 @@ RCT_EXPORT_METHOD(
 }
 
 RCT_EXPORT_METHOD(
-    get:(NSURL *) url
+    get:(NSURL *)url
     useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
@@ -171,8 +171,8 @@ RCT_EXPORT_METHOD(
 }
 
 RCT_EXPORT_METHOD(
-    clearByName:(NSURL *) url
-    name:(NSString *) name
+    clearByName:(NSURL *)url
+    name:(NSString *)name
     useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
@@ -191,7 +191,6 @@ RCT_EXPORT_METHOD(
 
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
-                    NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
                     for (NSHTTPCookie *cookie in allCookies) {
                         NSLog(@"Cookie names: %@", cookie.name);
                         if ([name isEqualToString:cookie.name]) {
@@ -256,8 +255,8 @@ RCT_EXPORT_METHOD(
     return nil;  
 }
 
--(NSHTTPCookie *)makeHTTPCookieObject:(NSURL *) url
-    props: (NSDictionary *)props)
+-(NSHTTPCookie *)makeHTTPCookieObject:(NSURL *)url
+    props:(NSDictionary *)props
 {
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
