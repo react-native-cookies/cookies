@@ -93,8 +93,8 @@ A cookie object can have one of the following fields:
     name: string;
     value: string;
     path?: string;
-    domain?: string; //if no domain specified, an url host will be used at set time
-    version?: string; //if no path specified, an empty path will be assumed
+    domain?: string;
+    version?: string;
     expiration?: string;
     secure?: boolean;
     httpOnly?: boolean;
@@ -120,7 +120,7 @@ CookieManager.set('http://example.com', {
   console.log('CookieManager.set =>', done);
 });
 
-*NB:* When no `domain` is specified, url host will be used instead. Domains starting with a dot e.g. `.example.com` will set the cookie for `http://example.com` or `http://something.example.com` or even `http://something.something.example.com`. In the majority of cases domains starting with a dot are a safer bet to ensure iOS takes them in correctly. 
+*NB:* When no `domain` is specified, url host will be used instead. 
 *NB:* When no `path` is specified, an empty path `/` will be assumed.
 
 // Set cookies from a response header

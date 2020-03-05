@@ -276,6 +276,9 @@ RCT_EXPORT_METHOD(
         [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
     }
     if (!isEmpty(domain)) {
+        if(![domain hasPrefix:@"."]) {
+            domain = [NSString stringWithFormat:@".%@", domain];
+        }
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
     } else {
         [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];

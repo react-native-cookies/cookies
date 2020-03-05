@@ -202,7 +202,12 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 .value(cookie.getString("value"));
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
-            cookieBuilder.domain(cookie.getString("domain"));
+            String domain = cookie.getString("domain");
+            // take off leading dot as Android doesn't like it
+            if (domain.startsWith(".")) {
+                domain = domain.substring(1);
+            }
+            cookieBuilder.domain(domain);
         } else if (extractedDomain != null && !extractedDomain.isEmpty()) {
             cookieBuilder.domain(extractedDomain);
         } else {
