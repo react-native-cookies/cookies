@@ -76,8 +76,8 @@ repositories {
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
-    implementation("com.squareup.okhttp3:okhttp:4.4.0")
-    implementation("com.squareup.okhttp3:okhttp-urlconnection:4.4.0")
+    implementation("com.squareup.okhttp3:okhttp:4.4.0") // necessary for the cookie setting to work
+    implementation("com.squareup.okhttp3:okhttp-urlconnection:4.4.0") //necessary to avoid clashes with react-native-fetch
 }
 
 def configureReactNativePom(def pom) {
