@@ -18,6 +18,7 @@
   "files": [
     "android",
     "ios",
+    "index.d.ts",
     "react-native-cookies.podspec"
   ],
   "author": {
