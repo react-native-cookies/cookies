@@ -93,7 +93,8 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             promise.reject(new Exception("Cannot remove cookie without domain / url"));
         }
 
-        String cookieString = name + "=''";
+        String cookieString = name + "=;"; // if in doubt setting the expiry in the past should completely remove ->
+                                           // expires=Fri, 2 Jan 1970 00:00:00 UTC;";
 
         if (USES_LEGACY_STORE) {
             mCookieManager.setCookie(url, cookieString);
@@ -162,19 +163,23 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 for (String cookieString : cookieHeaders) {
                     Cookie cookie = Cookie.parse(httpUrl, cookieString);
                     if (cookie != null) {
-                        WritableMap cookieMap = Arguments.createMap();
-                        cookieMap.putString("name", cookie.name());
-                        cookieMap.putString("value", cookie.value());
-                        cookieMap.putString("domain", cookie.domain());
-                        cookieMap.putString("path", cookie.path());
-                        // no version unavailable from this interface
-                        // cookieMap.putInt("version", cookie.getVersion());
-                        cookieMap.putBoolean("secure", cookie.secure());
-                        cookieMap.putBoolean("httpOnly", cookie.httpOnly());
+                        String name = cookie.name();
+                        String value = cookie.value();
+                        if (name != null && name != "" && value != null && value != "") {
+                            WritableMap cookieMap = Arguments.createMap();
+                            cookieMap.putString("name", name);
+                            cookieMap.putString("value", value);
+                            cookieMap.putString("domain", cookie.domain());
+                            cookieMap.putString("path", cookie.path());
+                            // no version unavailable from this interface
+                            // cookieMap.putInt("version", cookie.getVersion());
+                            cookieMap.putBoolean("secure", cookie.secure());
+                            cookieMap.putBoolean("httpOnly", cookie.httpOnly());
 
-                        cookieMap.putString("expiration", new Date(cookie.expiresAt()).toString());
+                            cookieMap.putString("expiration", new Date(cookie.expiresAt()).toString());
 
-                        allCookiesMap.putMap(cookie.name(), cookieMap);
+                            allCookiesMap.putMap(cookie.name(), cookieMap);
+                        }
                     }
                 }
             }
