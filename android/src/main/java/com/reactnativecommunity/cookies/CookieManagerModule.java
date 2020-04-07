@@ -25,6 +25,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
@@ -53,6 +56,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         if (cookieString == null) {
             promise.reject(new Exception("Unable to add cookie - invalid values"));
+            return;
         }
 
         addCookies(url, cookieString, promise);
@@ -62,6 +66,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void setFromResponse(String url, String cookie, final Promise promise) {
         if (cookie == null) {
             promise.reject(new Exception("Unable to add cookie - invalid values"));
+            return;
         }
 
         addCookies(url, cookie, promise);
@@ -89,26 +94,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearByName(String url, String name, Boolean useWebKit, final Promise promise) {
-        if (url == null) {
-            promise.reject(new Exception("Cannot remove cookie without domain / url"));
-        }
-
-        String cookieString = name + "=;"; // if in doubt setting the expiry in the past should completely remove ->
-                                           // expires=Fri, 2 Jan 1970 00:00:00 UTC;";
-
-        if (USES_LEGACY_STORE) {
-            mCookieManager.setCookie(url, cookieString);
-            mCookieSyncManager.sync();
-            promise.resolve(true);
-        } else {
-            mCookieManager.setCookie(url, cookieString, new ValueCallback<Boolean>() {
-                @Override
-                public void onReceiveValue(Boolean value) {
-                    promise.resolve(value);
-                }
-            });
-            mCookieManager.flush();
-        }
+        promise.reject(new Exception("Cannot remove a single cookie by name on Android"));
     }
 
     @ReactMethod
@@ -149,11 +135,41 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     private WritableMap getCookies(String url) throws Exception {
+
+        Map<String, Cookie> cookieObjects = getCookieObjects(url);
+
+        WritableMap allCookiesMap = Arguments.createMap();
+
+        Set<String> keys = cookieObjects.keySet();
+        for (String key : keys) {
+            Cookie cookie = cookieObjects.get(key);
+            if (cookie != null) {
+                WritableMap cookieMap = Arguments.createMap();
+                cookieMap.putString("name", cookie.name());
+                cookieMap.putString("value", cookie.value());
+                cookieMap.putString("domain", cookie.domain());
+                cookieMap.putString("path", cookie.path());
+                // no version unavailable from this interface
+                // cookieMap.putInt("version", cookie.getVersion());
+                cookieMap.putBoolean("secure", cookie.secure());
+                cookieMap.putBoolean("httpOnly", cookie.httpOnly());
+
+                long expires = cookie.expiresAt();
+                cookieMap.putString("expiration", new Date(expires).toString());
+
+                allCookiesMap.putMap(cookie.name(), cookieMap);
+            }
+        }
+
+        return allCookiesMap;
+    }
+
+    private Map<String, Cookie> getCookieObjects(String url) throws Exception {
         if (url == null || url.equals("")) {
             throw new Exception("Cannot get cookies without a url");
         }
 
-        WritableMap allCookiesMap = Arguments.createMap();
+        Map<String, Cookie> allCookiesMap = new HashMap<>();
 
         String cookiesString = mCookieManager.getCookie(url);
         if (cookiesString != null && !cookiesString.equals("")) {
@@ -166,19 +182,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                         String name = cookie.name();
                         String value = cookie.value();
                         if (name != null && name != "" && value != null && value != "") {
-                            WritableMap cookieMap = Arguments.createMap();
-                            cookieMap.putString("name", name);
-                            cookieMap.putString("value", value);
-                            cookieMap.putString("domain", cookie.domain());
-                            cookieMap.putString("path", cookie.path());
-                            // no version unavailable from this interface
-                            // cookieMap.putInt("version", cookie.getVersion());
-                            cookieMap.putBoolean("secure", cookie.secure());
-                            cookieMap.putBoolean("httpOnly", cookie.httpOnly());
-
-                            cookieMap.putString("expiration", new Date(cookie.expiresAt()).toString());
-
-                            allCookiesMap.putMap(cookie.name(), cookieMap);
+                            allCookiesMap.put(name, cookie);
                         }
                     }
                 }
@@ -188,6 +192,17 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     private String makeCookieString(String url, ReadableMap cookie) {
+        Cookie.Builder cookieBuilder = buildCookie(url, cookie);
+
+        if (cookieBuilder == null) {
+            return null;
+        }
+
+        return cookieBuilder.build().toString();
+    }
+
+
+    private Cookie.Builder buildCookie(String url, ReadableMap cookie) {
         Date date = null;
         try {
             date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
@@ -237,6 +252,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieBuilder.httpOnly();
         }
 
-        return cookieBuilder.build().toString();
+        return cookieBuilder;
     }
 }
