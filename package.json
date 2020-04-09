@@ -9,11 +9,17 @@
   },
   "keywords": [
     "react native",
-    "react-native",
+    "react-native-component",
     "android",
     "ios",
     "cookies",
     "webview"
+  ],
+  "files": [
+    "android",
+    "ios",
+    "index.d.ts",
+    "react-native-cookies.podspec"
   ],
   "author": {
     "name": "Jason Safaiyeh",
