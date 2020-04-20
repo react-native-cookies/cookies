@@ -152,8 +152,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 cookieMap.putBoolean("secure", cookie.secure());
                 cookieMap.putBoolean("httpOnly", cookie.httpOnly());
 
+                long setPersistentExpiry = 253402214400L;
                 long expires = cookie.expiresAt();
-                cookieMap.putString("expiration", new Date(expires).toString());
+                if (expires > 0 && expires < setPersistentExpiry) {
+                    cookieMap.putString("expiration", new Date(expires).toString());
+                }
 
                 allCookiesMap.putMap(cookie.name(), cookieMap);
             }
