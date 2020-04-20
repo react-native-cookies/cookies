@@ -149,8 +149,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 cookieMap.putString("value", cookie.value());
                 cookieMap.putString("domain", cookie.domain());
                 cookieMap.putString("path", cookie.path());
-                // no version unavailable from this interface
-                // cookieMap.putInt("version", cookie.getVersion());
                 cookieMap.putBoolean("secure", cookie.secure());
                 cookieMap.putBoolean("httpOnly", cookie.httpOnly());
 
@@ -200,7 +198,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         return cookieBuilder.build().toString();
     }
-
 
     private Cookie.Builder buildCookie(String url, ReadableMap cookie) {
         Date date = null;
