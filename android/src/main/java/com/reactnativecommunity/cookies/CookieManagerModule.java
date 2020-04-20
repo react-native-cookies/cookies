@@ -52,7 +52,13 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) {
-        String cookieString = makeCookieString(url, cookie);
+        String cookieString = null;
+        try {
+            cookieString = makeCookieString(url, cookie);
+        } catch (Exception e) {
+            promise.reject(e);
+            return;
+        }
 
         if (cookieString == null) {
             promise.reject(new Exception("Unable to add cookie - invalid values"));
@@ -152,9 +158,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 cookieMap.putBoolean("secure", cookie.secure());
                 cookieMap.putBoolean("httpOnly", cookie.httpOnly());
 
-                long setPersistentExpiry = 253402214400L;
+                // if persistent the library will set expiry to 31 Dec 9999
+                // which we don't want to display to the developer
+                long persistentExpiry = 253402214400L;
                 long expires = cookie.expiresAt();
-                if (expires > 0 && expires < setPersistentExpiry) {
+                if (expires > 0 && expires < persistentExpiry) {
                     cookieMap.putString("expiration", new Date(expires).toString());
                 }
 
@@ -182,7 +190,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                     if (cookie != null) {
                         String name = cookie.name();
                         String value = cookie.value();
-                        if (name != null && name != "" && value != null && value != "") {
+                        if (name !=null && !name.equals("") && value !=null && !value.equals("")) {
                             allCookiesMap.put(name, cookie);
                         }
                     }
@@ -192,17 +200,20 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return allCookiesMap;
     }
 
-    private String makeCookieString(String url, ReadableMap cookie) {
-        Cookie.Builder cookieBuilder = buildCookie(url, cookie);
-
-        if (cookieBuilder == null) {
-            return null;
+    private String makeCookieString(String url, ReadableMap cookie) throws Exception {
+        URL parsedUrl = null;
+        try {
+            parsedUrl = new URL(url);
+        } catch (Exception e) {
+            throw new Exception("Unable to parse URL ");
         }
 
-        return cookieBuilder.build().toString();
+        return buildCookie(parsedUrl, cookie)
+                .build()
+                .toString();
     }
 
-    private Cookie.Builder buildCookie(String url, ReadableMap cookie) {
+    private Cookie.Builder buildCookie(URL url, ReadableMap cookie) throws Exception {
         Date date = null;
         try {
             date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
@@ -210,20 +221,15 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         }
 
-        String extractedDomain = null;
-        try {
-            URL parsedUrl = new URL(url);
-            extractedDomain = parsedUrl.getHost();
-        } catch (Exception e) {
+        String extractedDomain = url.getHost();
 
-        }
-
-        Cookie.Builder cookieBuilder = new Cookie.Builder().name(cookie.getString("name"))
+        Cookie.Builder cookieBuilder = new Cookie.Builder()
+                .name(cookie.getString("name"))
                 .value(cookie.getString("value"));
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
             String domain = cookie.getString("domain");
-            // take off leading dot as Android doesn't like it
+            // take off leading dot as Android doesn't like it but will include subdomains by default
             if (domain.startsWith(".")) {
                 domain = domain.substring(1);
             }
@@ -232,7 +238,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieBuilder.domain(extractedDomain);
         } else {
             // assume something went terribly wrong here and no cookie can be created
-            return null;
+            throw new Exception("Unable to supply domain for cookie");
         }
 
         if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
