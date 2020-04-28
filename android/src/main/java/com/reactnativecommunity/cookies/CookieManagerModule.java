@@ -222,6 +222,12 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         String extractedDomain = url.getHost();
 
+        if (extractedDomain == null || extractedDomain.isEmpty()){
+            // assume something went terribly wrong here and no cookie can be created
+            throw new Exception("Cookie URL contains no valid host");
+        }
+
+
         HttpCookie cookieBuilder = new HttpCookie(cookie.getString("name"), cookie.getString("value"));
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
@@ -230,12 +236,13 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             if (domain.startsWith(".")) {
                 domain = domain.substring(1);
             }
+
+            if(!extractedDomain.contains(domain) || !extractedDomain.equals(domain)){
+                throw new Exception("Cookie URL host " + extractedDomain + " and domain " + domain + " mismatched. The cookie won't set correctly.");
+            }
             cookieBuilder.setDomain(domain);
-        } else if (extractedDomain != null && !extractedDomain.isEmpty()) {
+        } else  {
             cookieBuilder.setDomain(extractedDomain);
-        } else {
-            // assume something went terribly wrong here and no cookie can be created
-            throw new Exception("Unable to supply domain for cookie");
         }
 
         if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
