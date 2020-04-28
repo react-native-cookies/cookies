@@ -21,16 +21,15 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.io.IOException;
+import java.net.HttpCookie;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
@@ -142,55 +141,56 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     private WritableMap getCookies(String url) throws Exception {
 
-        Map<String, Cookie> cookieObjects = getCookieObjects(url);
+        Map<String, HttpCookie> cookieObjects = getCookieObjects(url);
 
         WritableMap allCookiesMap = Arguments.createMap();
 
         Set<String> keys = cookieObjects.keySet();
         for (String key : keys) {
-            Cookie cookie = cookieObjects.get(key);
+            HttpCookie cookie = cookieObjects.get(key);
             if (cookie != null) {
                 WritableMap cookieMap = Arguments.createMap();
-                cookieMap.putString("name", cookie.name());
-                cookieMap.putString("value", cookie.value());
-                cookieMap.putString("domain", cookie.domain());
-                cookieMap.putString("path", cookie.path());
-                cookieMap.putBoolean("secure", cookie.secure());
-                cookieMap.putBoolean("httpOnly", cookie.httpOnly());
+                cookieMap.putString("name", cookie.getName());
+                cookieMap.putString("value", cookie.getValue());
+                cookieMap.putString("domain", cookie.getDomain());
+                cookieMap.putString("path", cookie.getPath());
+                cookieMap.putBoolean("secure", cookie.getSecure());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    cookieMap.putBoolean("httpOnly", cookie.isHttpOnly());
+                }
 
                 // if persistent the library will set expiry to 31 Dec 9999
                 // which we don't want to display to the developer
                 long persistentExpiry = 253402214400L;
-                long expires = cookie.expiresAt();
+                long expires = cookie.getMaxAge();
                 if (expires > 0 && expires < persistentExpiry) {
                     cookieMap.putString("expiration", new Date(expires).toString());
                 }
 
-                allCookiesMap.putMap(cookie.name(), cookieMap);
+                allCookiesMap.putMap(cookie.getName(), cookieMap);
             }
         }
 
         return allCookiesMap;
     }
 
-    private Map<String, Cookie> getCookieObjects(String url) throws Exception {
+    private Map<String, HttpCookie> getCookieObjects(String url) throws Exception {
         if (url == null || url.equals("")) {
             throw new Exception("Cannot get cookies without a url");
         }
 
-        Map<String, Cookie> allCookiesMap = new HashMap<>();
+        Map<String, HttpCookie> allCookiesMap = new HashMap<>();
 
         String cookiesString = mCookieManager.getCookie(url);
         if (cookiesString != null && !cookiesString.equals("")) {
             String[] cookieHeaders = cookiesString.split(";");
-            HttpUrl httpUrl = HttpUrl.parse(url);
-            if (httpUrl != null) {
-                for (String cookieString : cookieHeaders) {
-                    Cookie cookie = Cookie.parse(httpUrl, cookieString);
+            for (String singleCookie : cookieHeaders) {
+                List<HttpCookie> cookies = HttpCookie.parse(singleCookie);
+                for (HttpCookie cookie : cookies) {
                     if (cookie != null) {
-                        String name = cookie.name();
-                        String value = cookie.value();
-                        if (name !=null && !name.equals("") && value !=null && !value.equals("")) {
+                        String name = cookie.getName();
+                        String value = cookie.getValue();
+                        if (name != null && !name.equals("") && value != null && !value.equals("")) {
                             allCookiesMap.put(name, cookie);
                         }
                     }
@@ -209,11 +209,10 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         }
 
         return buildCookie(parsedUrl, cookie)
-                .build()
                 .toString();
     }
 
-    private Cookie.Builder buildCookie(URL url, ReadableMap cookie) throws Exception {
+    private HttpCookie buildCookie(URL url, ReadableMap cookie) throws Exception {
         Date date = null;
         try {
             date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
@@ -223,9 +222,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         String extractedDomain = url.getHost();
 
-        Cookie.Builder cookieBuilder = new Cookie.Builder()
-                .name(cookie.getString("name"))
-                .value(cookie.getString("value"));
+        HttpCookie cookieBuilder = new HttpCookie(cookie.getString("name"), cookie.getString("value"));
 
         if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
             String domain = cookie.getString("domain");
@@ -233,29 +230,31 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             if (domain.startsWith(".")) {
                 domain = domain.substring(1);
             }
-            cookieBuilder.domain(domain);
+            cookieBuilder.setDomain(domain);
         } else if (extractedDomain != null && !extractedDomain.isEmpty()) {
-            cookieBuilder.domain(extractedDomain);
+            cookieBuilder.setDomain(extractedDomain);
         } else {
             // assume something went terribly wrong here and no cookie can be created
             throw new Exception("Unable to supply domain for cookie");
         }
 
         if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
-            cookieBuilder.path(cookie.getString("path"));
+            cookieBuilder.setPath(cookie.getString("path"));
         }
         // unlike iOS, Android will handle no path gracefully and assume "/""
 
         if (date != null) {
-            cookieBuilder.expiresAt(date.getTime());
+            cookieBuilder.setMaxAge(date.getTime());
         }
 
         if (cookie.hasKey("secure") && cookie.getBoolean("secure")) {
-            cookieBuilder.secure();
+            cookieBuilder.setSecure(true);
         }
 
-        if (cookie.hasKey("httpOnly") && cookie.getBoolean("httpOnly")) {
-            cookieBuilder.httpOnly();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (cookie.hasKey("httpOnly") && cookie.getBoolean("httpOnly")) {
+                cookieBuilder.setHttpOnly(true);
+            }
         }
 
         return cookieBuilder;
