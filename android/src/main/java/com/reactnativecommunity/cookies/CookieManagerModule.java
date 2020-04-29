@@ -96,8 +96,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void get(String url, Boolean useWebKit, Promise promise) {
+        if (isEmpty(url)) {
+            promise.reject(new Exception(INVALID_URL_MISSING_HTTP));
+            return;
+        }
         try {
-            WritableMap cookieMap = getCookies(url);
+            String cookiesString = mCookieManager.getCookie(url);
+
+            WritableMap cookieMap = createCookieList(cookiesString);
             promise.resolve(cookieMap);
         } catch (Exception e) {
             promise.reject(e);
@@ -146,47 +152,26 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private WritableMap getCookies(String url) throws Exception {
-
-        Map<String, HttpCookie> cookieObjects = getCookieObjects(url);
-
+    private WritableMap createCookieList(String allCookies) throws Exception {
         WritableMap allCookiesMap = Arguments.createMap();
 
-        Set<String> keys = cookieObjects.keySet();
-        for (String key : keys) {
-            HttpCookie cookie = cookieObjects.get(key);
-            if (cookie != null) {
-                WritableMap cookieMap = createCookieData(cookie);
-                allCookiesMap.putMap(cookie.getName(), cookieMap);
-            }
-        }
-
-        return allCookiesMap;
-    }
-
-    private Map<String, HttpCookie> getCookieObjects(String url) throws Exception {
-        if (isEmpty(url)) {
-            throw new Exception("Cannot get cookies without a url");
-        }
-
-        Map<String, HttpCookie> allCookiesMap = new HashMap<>();
-
-        String cookiesString = mCookieManager.getCookie(url);
-        if (cookiesString != null && !cookiesString.equals("")) {
-            String[] cookieHeaders = cookiesString.split(";");
+        if (!isEmpty(allCookies)) {
+            String[] cookieHeaders = allCookies.split(";");
             for (String singleCookie : cookieHeaders) {
                 List<HttpCookie> cookies = HttpCookie.parse(singleCookie);
                 for (HttpCookie cookie : cookies) {
                     if (cookie != null) {
                         String name = cookie.getName();
                         String value = cookie.getValue();
-                        if (name != null && !name.equals("") && value != null && !value.equals("")) {
-                            allCookiesMap.put(name, cookie);
+                        if (!isEmpty(name) && !isEmpty(value)) {
+                            WritableMap cookieMap = createCookieData(cookie);
+                            allCookiesMap.putMap(name, cookieMap);
                         }
                     }
                 }
             }
         }
+
         return allCookiesMap;
     }
 
@@ -195,14 +180,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         try {
             parsedUrl = new URL(url);
         } catch (Exception e) {
-            throw new Exception("Invalid URL");
+            throw new Exception(INVALID_URL_MISSING_HTTP);
         }
 
-        String topLevelDomain = url.getHost();
+        String topLevelDomain = parsedUrl.getHost();
 
         if (isEmpty(topLevelDomain)) {
             // assume something went terribly wrong here and no cookie can be created
-            throw new Exception("Cookie URL contains no valid host");
+            throw new Exception(INVALID_URL_MISSING_HTTP);
         }
 
         HttpCookie cookieBuilder = new HttpCookie(cookie.getString("name"), cookie.getString("value"));
