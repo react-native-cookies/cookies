@@ -111,7 +111,7 @@ RCT_EXPORT_METHOD(
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = url.host;
 
-                if (topLevelDomain == nil) {
+                if (isEmpty(topLevelDomain)) {
                     reject(@"", INVALID_URL_MISSING_HTTP, nil);
                     return;
                 }
@@ -184,7 +184,7 @@ RCT_EXPORT_METHOD(
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = url.host;
 
-                if (topLevelDomain == nil) {
+                if (isEmpty(topLevelDomain)) {
                     reject(@"", INVALID_URL_MISSING_HTTP, nil);
                     return;
                 }
@@ -249,11 +249,6 @@ RCT_EXPORT_METHOD(
     return cookieList;
 }
 
--(NSString *)makeCookieString:(NSDictionary *)props
-{
-    return nil;  
-}
-
 -(NSHTTPCookie *)makeHTTPCookieObject:(NSURL *)url
     props:(NSDictionary *)props
 {
@@ -269,12 +264,9 @@ RCT_EXPORT_METHOD(
     NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
     [cookieProperties setObject:name forKey:NSHTTPCookieName];
     [cookieProperties setObject:value forKey:NSHTTPCookieValue];
-    if (!isEmpty(path)) {
-        [cookieProperties setObject:path forKey:NSHTTPCookiePath];
-    } else {
-        [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
-    }
+    
     if (!isEmpty(domain)) {
+        //Adding a leading . to match android behaviour of always including subdomains
         if(![domain hasPrefix:@"."]) {
             domain = [NSString stringWithFormat:@".%@", domain];
         }
@@ -282,6 +274,13 @@ RCT_EXPORT_METHOD(
     } else {
         [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];
     }
+
+    if (!isEmpty(path)) {
+        [cookieProperties setObject:path forKey:NSHTTPCookiePath];
+    } else {
+        [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
+    }
+
     if (!isEmpty(version)) {
          [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
     }

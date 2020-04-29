@@ -36,6 +36,12 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP;
     private static final boolean HTTP_ONLY_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
 
+    private static final String INVALID_URL_MISSING_HTTP = "Invalid URL: It may be missing a protocol (ex. http:// or https://).";
+    private static final String INVALID_COOKIE_VALUES = "Unable to add cookie - invalid values";
+    private static final String GET_ALL_NOT_SUPPORTED = "Get all cookies not supported for Android (iOS only)";
+    private static final String CLEAR_BY_NAME_NOT_SUPPORTED = "Cannot remove a single cookie by name on Android";
+    private static final String INVALID_DOMAINS = "Cookie URL host %s and domain %s mismatched. The cookie won't set correctly.";
+
     private CookieManager mCookieManager;
     private CookieSyncManager mCookieSyncManager;
 
@@ -54,14 +60,14 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) {
         String cookieString = null;
         try {
-            cookieString = makeCookieString(url, cookie);
+            cookieString = makeHTTPCookieObject(url, cookie).toString();
         } catch (Exception e) {
             promise.reject(e);
             return;
         }
 
         if (cookieString == null) {
-            promise.reject(new Exception("Unable to add cookie - invalid values"));
+            promise.reject(new Exception(INVALID_COOKIE_VALUES));
             return;
         }
 
@@ -71,7 +77,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setFromResponse(String url, String cookie, final Promise promise) {
         if (cookie == null) {
-            promise.reject(new Exception("Unable to add cookie - invalid values"));
+            promise.reject(new Exception(INVALID_COOKIE_VALUES));
             return;
         }
 
@@ -85,7 +91,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void getAll(Boolean useWebKit, Promise promise) {
-        promise.reject(new Exception("Get all cookies not supported for Android (iOS only)"));
+        promise.reject(new Exception(GET_ALL_NOT_SUPPORTED));
     }
 
     @ReactMethod
@@ -100,7 +106,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearByName(String url, String name, Boolean useWebKit, final Promise promise) {
-        promise.reject(new Exception("Cannot remove a single cookie by name on Android"));
+        promise.reject(new Exception(CLEAR_BY_NAME_NOT_SUPPORTED));
     }
 
     @ReactMethod
@@ -150,24 +156,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         for (String key : keys) {
             HttpCookie cookie = cookieObjects.get(key);
             if (cookie != null) {
-                WritableMap cookieMap = Arguments.createMap();
-                cookieMap.putString("name", cookie.getName());
-                cookieMap.putString("value", cookie.getValue());
-                cookieMap.putString("domain", cookie.getDomain());
-                cookieMap.putString("path", cookie.getPath());
-                cookieMap.putBoolean("secure", cookie.getSecure());
-                if (HTTP_ONLY_SUPPORTED) {
-                    cookieMap.putBoolean("httpOnly", cookie.isHttpOnly());
-                }
-
-                // if persistent the library will set expiry to 31 Dec 9999
-                // which we don't want to display to the developer
-                long persistentExpiry = 253402214400L;
-                long expires = cookie.getMaxAge();
-                if (expires > 0 && expires < persistentExpiry) {
-                    cookieMap.putString("expiration", new Date(expires).toString());
-                }
-
+                WritableMap cookieMap = createCookieData(cookie);
                 allCookiesMap.putMap(cookie.getName(), cookieMap);
             }
         }
@@ -176,7 +165,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     private Map<String, HttpCookie> getCookieObjects(String url) throws Exception {
-        if (url == null || url.equals("")) {
+        if (isEmpty(url)) {
             throw new Exception("Cannot get cookies without a url");
         }
 
@@ -201,55 +190,51 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return allCookiesMap;
     }
 
-    private String makeCookieString(String url, ReadableMap cookie) throws Exception {
+    private HttpCookie makeHTTPCookieObject(String url, ReadableMap cookie) throws Exception {
         URL parsedUrl = null;
         try {
             parsedUrl = new URL(url);
         } catch (Exception e) {
-            throw new Exception("Unable to parse URL ");
+            throw new Exception("Invalid URL");
         }
 
-        return buildCookie(parsedUrl, cookie)
-                .toString();
-    }
+        String topLevelDomain = url.getHost();
 
-    private HttpCookie buildCookie(URL url, ReadableMap cookie) throws Exception {
+        if (isEmpty(topLevelDomain)) {
+            // assume something went terribly wrong here and no cookie can be created
+            throw new Exception("Cookie URL contains no valid host");
+        }
+
+        HttpCookie cookieBuilder = new HttpCookie(cookie.getString("name"), cookie.getString("value"));
+
+        if (cookie.hasKey("domain") && !isEmpty(cookie.getString("domain"))) {
+            String domain = cookie.getString("domain");
+            // strip the leading . as Android doesn't take it
+            // but will include subdomains by default
+            if (domain.startsWith(".")) {
+                domain = domain.substring(1);
+            }
+
+            if (!topLevelDomain.contains(domain) && !topLevelDomain.equals(domain)) {
+                throw new Exception(String.format(INVALID_DOMAINS, topLevelDomain, domain));
+            }
+
+            cookieBuilder.setDomain(domain);
+        } else {
+            cookieBuilder.setDomain(topLevelDomain);
+        }
+
+        // unlike iOS, Android will handle no path gracefully and assume "/""
+        if (cookie.hasKey("path") && !isEmpty(cookie.getString("path"))) {
+            cookieBuilder.setPath(cookie.getString("path"));
+        }
+
         Date date = null;
         try {
             date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
         } catch (Exception ignored) {
 
         }
-
-        String extractedDomain = url.getHost();
-
-        if (extractedDomain == null || extractedDomain.isEmpty()){
-            // assume something went terribly wrong here and no cookie can be created
-            throw new Exception("Cookie URL contains no valid host");
-        }
-
-
-        HttpCookie cookieBuilder = new HttpCookie(cookie.getString("name"), cookie.getString("value"));
-
-        if (cookie.hasKey("domain") && cookie.getString("domain") != null && !cookie.getString("domain").isEmpty()) {
-            String domain = cookie.getString("domain");
-            // take off leading dot as Android doesn't like it but will include subdomains by default
-            if (domain.startsWith(".")) {
-                domain = domain.substring(1);
-            }
-
-            if(!extractedDomain.contains(domain) || !extractedDomain.equals(domain)){
-                throw new Exception("Cookie URL host " + extractedDomain + " and domain " + domain + " mismatched. The cookie won't set correctly.");
-            }
-            cookieBuilder.setDomain(domain);
-        } else  {
-            cookieBuilder.setDomain(extractedDomain);
-        }
-
-        if (cookie.hasKey("path") && cookie.getString("path") != null && !cookie.getString("path").isEmpty()) {
-            cookieBuilder.setPath(cookie.getString("path"));
-        }
-        // unlike iOS, Android will handle no path gracefully and assume "/""
 
         if (date != null) {
             cookieBuilder.setMaxAge(date.getTime());
@@ -266,5 +251,30 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         }
 
         return cookieBuilder;
+    }
+
+    private WritableMap createCookieData(HttpCookie cookie) {
+        WritableMap cookieMap = Arguments.createMap();
+        cookieMap.putString("name", cookie.getName());
+        cookieMap.putString("value", cookie.getValue());
+        cookieMap.putString("domain", cookie.getDomain());
+        cookieMap.putString("path", cookie.getPath());
+        cookieMap.putBoolean("secure", cookie.getSecure());
+        if (HTTP_ONLY_SUPPORTED) {
+            cookieMap.putBoolean("httpOnly", cookie.isHttpOnly());
+        }
+
+        // if persistent the library will set expiry to 31 Dec 9999
+        // which we don't want to display to the developer
+        long persistentExpiry = 253402214400L;
+        long expires = cookie.getMaxAge();
+        if (expires > 0 && expires < persistentExpiry) {
+            cookieMap.putString("expiration", new Date(expires).toString());
+        }
+        return cookieMap;
+    }
+
+    private boolean isEmpty(String value) {
+        return value == null || value.isEmpty();
     }
 }
