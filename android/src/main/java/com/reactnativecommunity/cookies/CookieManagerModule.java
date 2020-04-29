@@ -24,12 +24,15 @@ import java.io.IOException;
 import java.net.HttpCookie;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
@@ -249,17 +252,22 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieMap.putBoolean("httpOnly", cookie.isHttpOnly());
         }
 
-        // if persistent the library will set expiry to 31 Dec 9999
-        // which we don't want to display to the developer
-        long persistentExpiry = 253402214400L;
+        // if persistent the max Age will be -1
         long expires = cookie.getMaxAge();
-        if (expires > 0 && expires < persistentExpiry) {
-            cookieMap.putString("expiration", new Date(expires).toString());
+        if (expires > 0) {
+            cookieMap.putString("expiration", formatDate(new Date(expires)));
         }
         return cookieMap;
     }
 
     private boolean isEmpty(String value) {
         return value == null || value.isEmpty();
+    }
+
+    private String formatDate(Date expires) {
+        // ios formats as yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ
+        DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df.format(expires);
     }
 }
