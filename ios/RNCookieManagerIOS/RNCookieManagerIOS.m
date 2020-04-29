@@ -14,6 +14,7 @@
 
 static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
 static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: It may be missing a protocol (ex. http:// or https://).";
+static NSString * const INVALID_DOMAINS = "Cookie URL host %@ and domain %@ mismatched. The cookie won't set correctly.";
 
 static inline BOOL isEmpty(id value)
 {
@@ -48,8 +49,13 @@ RCT_EXPORT_METHOD(
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSHTTPCookie *cookie = [self makeHTTPCookieObject:url props:props];
+    @try {
+        NSHTTPCookie *cookie = [self makeHTTPCookieObject:url props:props];
+    }
+    @catch ( NSException *e ) {
+        reject(@"", [e reason], e);
+        return;
+    }
 
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
@@ -121,7 +127,6 @@ RCT_EXPORT_METHOD(
                     NSMutableDictionary *cookies = [NSMutableDictionary dictionary];
                     for (NSHTTPCookie *cookie in allCookies) {
                         if ([topLevelDomain containsString:cookie.domain] ||
-                            [cookie.domain containsString: topLevelDomain] ||
                             [cookie.domain isEqualToString: topLevelDomain]) {
                             [cookies setObject:[self createCookieData:cookie] forKey:cookie.name];
                         }
@@ -252,6 +257,16 @@ RCT_EXPORT_METHOD(
 -(NSHTTPCookie *)makeHTTPCookieObject:(NSURL *)url
     props:(NSDictionary *)props
 {
+    NSString *topLevelDomain = url.host;
+    
+    if (isEmpty(url.host)){
+        NSException* myException = [NSException
+            exceptionWithName:@"Exception"
+            reason:INVALID_URL_MISSING_HTTP
+            userInfo:nil];
+        @throw myException;
+    }
+    
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
     NSString *path = [RCTConvert NSString:props[@"path"]];
@@ -270,6 +285,19 @@ RCT_EXPORT_METHOD(
         if(![domain hasPrefix:@"."]) {
             domain = [NSString stringWithFormat:@".%@", domain];
         }
+
+        //stripping the leading . to ensure the following check is accurate
+        NSString *strippedDomain = [domain substringFromIndex:1];
+
+        if (![topLevelDomain containsString:strippedDomain] &&
+            ![strippedDomain isEqualToString: topLevelDomain]) {
+                NSException* myException = [NSException
+                    exceptionWithName:@"Exception"
+                    reason: [NSString stringWithFormat:INVALID_DOMAINS, topLevelDomain, domain];
+                    userInfo:nil];
+                @throw myException;
+        }
+
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
     } else {
         [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];
