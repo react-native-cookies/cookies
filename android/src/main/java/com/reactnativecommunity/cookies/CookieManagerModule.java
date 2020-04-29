@@ -33,7 +33,8 @@ import java.util.Set;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
 
-    private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < 21;
+    private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP;
+    private static final boolean HTTP_ONLY_SUPPORTED = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
 
     private CookieManager mCookieManager;
     private CookieSyncManager mCookieSyncManager;
@@ -155,7 +156,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 cookieMap.putString("domain", cookie.getDomain());
                 cookieMap.putString("path", cookie.getPath());
                 cookieMap.putBoolean("secure", cookie.getSecure());
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (HTTP_ONLY_SUPPORTED) {
                     cookieMap.putBoolean("httpOnly", cookie.isHttpOnly());
                 }
 
@@ -258,7 +259,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieBuilder.setSecure(true);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (HTTP_ONLY_SUPPORTED) {
             if (cookie.hasKey("httpOnly") && cookie.getBoolean("httpOnly")) {
                 cookieBuilder.setHttpOnly(true);
             }
