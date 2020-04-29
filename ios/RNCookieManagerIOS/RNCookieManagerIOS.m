@@ -192,7 +192,6 @@ RCT_EXPORT_METHOD(
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
                     for (NSHTTPCookie *cookie in allCookies) {
-                        NSLog(@"Cookie names: %@", cookie.name);
                         if ([name isEqualToString:cookie.name]) {
                              [foundCookiesList addObject:cookie];
                              foundCookies = @YES;
