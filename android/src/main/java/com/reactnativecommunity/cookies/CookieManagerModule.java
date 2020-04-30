@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) Joseph P. Ferraro
  * <p>
  * This source code is licensed under the MIT license found in the
@@ -61,7 +61,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) {
         String cookieString = null;
         try {
-            cookieString = makeHTTPCookieObject(url, cookie).toString();
+            cookieString = toRFC6265string(makeHTTPCookieObject(url, cookie));
         } catch (Exception e) {
             promise.reject(e);
             return;
@@ -215,16 +215,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieBuilder.setPath(cookie.getString("path"));
         }
 
-        Date date = null;
-        try {
-            date = dateFormatter().parse(cookie.getString("expiration"));
-        } catch (Exception e) {
-            String message = e.getMessage();
-            Log.i("Cookies", message != null ? message : "Unable to parse date");
-        }
-
-        if (date != null) {
-            cookieBuilder.setMaxAge(date.getTime());
+        if (cookie.hasKey("expiration") && !isEmpty(cookie.getString("expiration"))) {
+            Date date = parseDate(cookie.getString("expiration"));
+            if (date != null) {
+                cookieBuilder.setMaxAge(date.getTime());
+            }
         }
 
         if (cookie.hasKey("secure") && cookie.getBoolean("secure")) {
@@ -254,26 +249,113 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         // if persistent the max Age will be -1
         long expires = cookie.getMaxAge();
         if (expires > 0) {
-            try {
-                String expiry = dateFormatter().format(new Date(expires));
+            String expiry = formatDate(new Date(expires));
+            if (!isEmpty(expiry)) {
                 cookieMap.putString("expiration", expiry);
-            } catch (Exception e) {
-                String message = e.getMessage();
-                Log.i("Cookies", message != null ? message : "Unable to parse date");
             }
         }
         return cookieMap;
+    }
+
+    /**
+     * As HttpCookie is designed specifically for headers, it only gives us 2 formats on toString
+     * dependent on the cookie version: 0 = Netscape; 1 = RFC 2965/2109, both without leading "Cookie:" token.
+     * For our purposes RFC 6265 is the right way to go.
+     * This is a convenience method to give us the right formatting.
+     */
+    private String toRFC6265string(HttpCookie cookie) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(cookie.getName())
+                .append('=')
+                .append(cookie.getValue());
+
+        if (!cookie.hasExpired()) {
+            long expiresAt = cookie.getMaxAge();
+            if (expiresAt > 0) {
+                String dateString = formatDate(new Date(expiresAt), true);
+                if (!isEmpty(dateString)) {
+                    builder.append("; expires=").append(dateString);
+                }
+            }
+        }
+
+        if (!isEmpty(cookie.getDomain())) {
+            builder.append("; domain=")
+                    .append(cookie.getDomain());
+        }
+
+        if (!isEmpty(cookie.getPath())) {
+            builder.append("; path=")
+                    .append(cookie.getPath());
+        }
+
+        if (cookie.getSecure()) {
+            builder.append("; secure");
+        }
+
+        if (HTTP_ONLY_SUPPORTED && cookie.isHttpOnly()) {
+            builder.append("; httponly");
+        }
+
+        return builder.toString();
     }
 
     private boolean isEmpty(String value) {
         return value == null || value.isEmpty();
     }
 
+    /**
+     * Used for pushing cookies expiry time in and out of the library.
+     *
+     * @return simple date formatter
+     */
     private DateFormat dateFormatter() {
         // suggested formatting -> return DateTimeFormatter.RFC_1123_DATE_TIME;
         // matching ios format as yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
         return df;
+    }
+
+    /**
+     * Used building the correctly formatted date for a cookie string in RFC_1123_DATE_TIME format
+     *
+     * @return simple date formatter
+     */
+    private DateFormat RFC1123dateFormatter() {
+        DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df;
+    }
+
+    private Date parseDate(String dateString) {
+        return parseDate(dateString, false);
+    }
+
+    private Date parseDate(String dateString, boolean rfc1123) {
+        Date date = null;
+        try {
+            date = (rfc1123 ? RFC1123dateFormatter() : dateFormatter()).parse(dateString);
+        } catch (Exception e) {
+            String message = e.getMessage();
+            Log.i("Cookies", message != null ? message : "Unable to parse date");
+        }
+        return date;
+    }
+
+    private String formatDate(Date date) {
+        return formatDate(date, false);
+    }
+
+    private String formatDate(Date date, boolean rfc1123) {
+        String dateString = null;
+        try {
+            dateString = (rfc1123 ? RFC1123dateFormatter() : dateFormatter()).format(date);
+        } catch (Exception e) {
+            String message = e.getMessage();
+            Log.i("Cookies", message != null ? message : "Unable to format date");
+        }
+        return dateString;
     }
 }
