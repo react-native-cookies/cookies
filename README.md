@@ -97,7 +97,7 @@ export interface Cookie {
   path?: string;
   domain?: string;
   version?: string;
-  expiration?: string;
+  expires?: string;
   secure?: boolean;
   httpOnly?: boolean;
 }
@@ -117,7 +117,7 @@ CookieManager.set('http://example.com', {
   domain: 'some domain',
   path: '/',
   version: '1',
-  expiration: '2015-05-30T12:30:00.00-05:00'
+  expires: '2015-05-30T12:30:00.00-05:00'
 }).then((done) => {
   console.log('CookieManager.set =>', done);
 });
@@ -218,7 +218,7 @@ const newCookie: = {
 	domain: 'some domain',
 	path: '/',
 	version: '1',
-	expiration: '2015-05-30T12:30:00.00-05:00'
+	expires: '2015-05-30T12:30:00.00-05:00'
 };
 
 CookieManager.set('http://example.com', newCookie, useWebKit)

@@ -215,8 +215,8 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             cookieBuilder.setPath(cookie.getString("path"));
         }
 
-        if (cookie.hasKey("expiration") && !isEmpty(cookie.getString("expiration"))) {
-            Date date = parseDate(cookie.getString("expiration"));
+        if (cookie.hasKey("expires") && !isEmpty(cookie.getString("expires"))) {
+            Date date = parseDate(cookie.getString("expires"));
             if (date != null) {
                 cookieBuilder.setMaxAge(date.getTime());
             }
@@ -251,7 +251,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         if (expires > 0) {
             String expiry = formatDate(new Date(expires));
             if (!isEmpty(expiry)) {
-                cookieMap.putString("expiration", expiry);
+                cookieMap.putString("expires", expiry);
             }
         }
         return cookieMap;

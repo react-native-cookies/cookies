@@ -272,7 +272,7 @@ RCT_EXPORT_METHOD(
     NSString *path = [RCTConvert NSString:props[@"path"]];
     NSString *domain = [RCTConvert NSString:props[@"domain"]];
     NSString *version = [RCTConvert NSString:props[@"version"]];
-    NSDate *expiration = [RCTConvert NSDate:props[@"expiration"]];
+    NSDate *expires = [RCTConvert NSDate:props[@"expires"]];
     NSNumber *secure = [RCTConvert NSNumber:props[@"secure"]];
     NSNumber *httpOnly = [RCTConvert NSNumber:props[@"httpOnly"]];
 
@@ -312,8 +312,8 @@ RCT_EXPORT_METHOD(
     if (!isEmpty(version)) {
          [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
     }
-    if (!isEmpty(expiration)) {
-         [cookieProperties setObject:expiration forKey:NSHTTPCookieExpires];
+    if (!isEmpty(expires)) {
+         [cookieProperties setObject:expires forKey:NSHTTPCookieExpires];
     }
     if (!isEmpty(secure)) {
         [cookieProperties setObject:secure forKey:@"secure"];     
@@ -336,7 +336,7 @@ RCT_EXPORT_METHOD(
     [cookieData setObject:cookie.domain forKey:@"domain"];
     [cookieData setObject:[NSString stringWithFormat:@"%@", @(cookie.version)] forKey:@"version"];
     if (!isEmpty(cookie.expiresDate)) {
-        [cookieData setObject:[self.formatter stringFromDate:cookie.expiresDate] forKey:@"expiration"];
+        [cookieData setObject:[self.formatter stringFromDate:cookie.expiresDate] forKey:@"expires"];
     }
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.secure] forKey:@"secure"];
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.HTTPOnly] forKey:@"httpOnly"];

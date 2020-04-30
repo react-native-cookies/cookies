@@ -5,7 +5,7 @@ declare module '@react-native-community/cookies' {
     path?: string;
     domain?: string;
     version?: string;
-    expiration?: string;
+    expires?: string;
     secure?: boolean;
     httpOnly?: boolean;
   }
