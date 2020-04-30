@@ -8,6 +8,7 @@
 package com.reactnativecommunity.cookies;
 
 import android.os.Build;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
@@ -27,11 +28,8 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 public class CookieManagerModule extends ReactContextBaseJavaModule {
@@ -219,9 +217,10 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         Date date = null;
         try {
-            date = SimpleDateFormat.getDateTimeInstance().parse(cookie.getString("expiration"));
-        } catch (Exception ignored) {
-
+            date = dateFormatter().parse(cookie.getString("expiration"));
+        } catch (Exception e) {
+            String message = e.getMessage();
+            Log.i("Cookies", message != null ? message : "Unable to parse date");
         }
 
         if (date != null) {
@@ -255,7 +254,13 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         // if persistent the max Age will be -1
         long expires = cookie.getMaxAge();
         if (expires > 0) {
-            cookieMap.putString("expiration", formatDate(new Date(expires)));
+            try {
+                String expiry = dateFormatter().format(new Date(expires));
+                cookieMap.putString("expiration", expiry);
+            } catch (Exception e) {
+                String message = e.getMessage();
+                Log.i("Cookies", message != null ? message : "Unable to parse date");
+            }
         }
         return cookieMap;
     }
@@ -264,10 +269,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return value == null || value.isEmpty();
     }
 
-    private String formatDate(Date expires) {
-        // ios formats as yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ
-        DateFormat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+    private DateFormat dateFormatter() {
+        // suggested formatting -> return DateTimeFormatter.RFC_1123_DATE_TIME;
+        // matching ios format as yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("GMT"));
-        return df.format(expires);
+        return df;
     }
 }
