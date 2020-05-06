@@ -22,6 +22,11 @@ Currently lacking support for Windows, macOS, and web. Support for these platfor
 yarn add @react-native-community/cookies
 ```
 
+Then link the native iOS package
+
+```
+npx pod-install
+```
 
 ## Setup (React Native < 0.60.0)
 
