@@ -14,7 +14,7 @@
 
 static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
 static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: It may be missing a protocol (ex. http:// or https://).";
-static NSString * const INVALID_DOMAINS = "Cookie URL host %@ and domain %@ mismatched. The cookie won't set correctly.";
+static NSString * const INVALID_DOMAINS = @"Cookie URL host %@ and domain %@ mismatched. The cookie won't set correctly.";
 
 static inline BOOL isEmpty(id value)
 {
@@ -49,8 +49,9 @@ RCT_EXPORT_METHOD(
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
 {
+    NSHTTPCookie *cookie;
     @try {
-        NSHTTPCookie *cookie = [self makeHTTPCookieObject:url props:props];
+        cookie = [self makeHTTPCookieObject:url props:props];
     }
     @catch ( NSException *e ) {
         reject(@"", [e reason], e);
@@ -293,7 +294,7 @@ RCT_EXPORT_METHOD(
             ![strippedDomain isEqualToString: topLevelDomain]) {
                 NSException* myException = [NSException
                     exceptionWithName:@"Exception"
-                    reason: [NSString stringWithFormat:INVALID_DOMAINS, topLevelDomain, domain];
+                    reason: [NSString stringWithFormat:INVALID_DOMAINS, topLevelDomain, domain]
                     userInfo:nil];
                 @throw myException;
         }
