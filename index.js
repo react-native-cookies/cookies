@@ -41,6 +41,11 @@ module.exports = {
     CookieManager.set(url, cookie, useWebKit),
   clearByName: (url, name, useWebKit = false) =>
     CookieManager.clearByName(url, name, useWebKit),
+  flush: async () => {
+    if (Platform.OS === 'android') {
+      await CookieManager.flush();
+    }
+  },
 };
 
 for (var i = 0; i < functions.length; i++) {

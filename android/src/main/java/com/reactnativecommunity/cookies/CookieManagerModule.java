@@ -86,6 +86,16 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void flush(Promise promise) {
+        try {
+            mCookieManager.flush();
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void getFromResponse(String url, Promise promise) throws URISyntaxException, IOException {
         promise.resolve(url);
     }

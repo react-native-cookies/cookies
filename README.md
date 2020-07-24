@@ -164,6 +164,12 @@ CookieManager.clearByName('http://example.com', 'cookie_name')
   .then((success) => {
     console.log('CookieManager.clearByName =>', success);
   });
+
+// flush cookies (ANDROID ONLY)
+CookieManager.flush()
+  .then((success) => {
+    console.log('CookieManager.flush =>', success);
+  });
 ```
 
 ### WebKit-Support (iOS only)
