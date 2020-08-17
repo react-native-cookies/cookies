@@ -39,6 +39,10 @@ module.exports = {
   get: (url, useWebKit = false) => CookieManager.get(url, useWebKit),
   set: (url, cookie, useWebKit = false) =>
     CookieManager.set(url, cookie, useWebKit),
+  setFromResponse: (url, cookie, useWebKit = false) =>
+    CookieManager.setFromResponse(url, cookie, useWebKit),
+  getFromResponse: (url, useWebKit = false) =>
+    CookieManager.getFromResponse(url, useWebKit),
   clearByName: (url, name, useWebKit = false) =>
     CookieManager.clearByName(url, name, useWebKit),
   flush: async () => {
