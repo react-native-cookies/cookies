@@ -41,6 +41,9 @@
   "dependencies": {
     "invariant": "^2.2.4"
   },
+  "peerDependencies": {
+    "react-native": ">= 0.60.2"
+  },
   "devDependencies": {
     "@react-native-community/eslint-config": "^0.0.6",
     "@react-native-community/eslint-plugin": "^1.0.0",
