@@ -98,7 +98,7 @@ protected List<ReactPackage> getPackages() {
 
 A cookie object can have one of the following fields:
 
-```javascript
+```typescript
 export interface Cookie {
   name: string;
   value: string;
