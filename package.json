@@ -4,8 +4,8 @@
   "description": "Cookie Manager for React Native",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-community/cookies.git",
-    "baseUrl": "https://github.com/react-native-community/cookies"
+    "url": "git+https://github.com/react-native-cookies/cookies.git",
+    "baseUrl": "https://github.com/react-native-cookies/cookies"
   },
   "keywords": [
     "react native",
@@ -29,9 +29,9 @@
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/react-native-community/cookies/issues"
+    "url": "https://github.com/react-native-cookies/cookies/issues"
   },
-  "homepage": "https://github.com/react-native-community/cookies#readme",
+  "homepage": "https://github.com/react-native-cookies/cookies#readme",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
