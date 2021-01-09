@@ -1,5 +1,5 @@
 {
-  "name": "@react-native-community/cookies",
+  "name": "@react-native-cookies/cookies",
   "version": "5.0.1",
   "description": "Cookie Manager for React Native",
   "repository": {
