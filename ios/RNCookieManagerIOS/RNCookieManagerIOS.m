@@ -80,7 +80,7 @@ RCT_EXPORT_METHOD(
     cookie:(NSString *)cookie
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
-    
+
     NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{@"Set-Cookie": cookie} forURL:url];
     [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:nil];
     resolve(@(YES));
@@ -185,7 +185,7 @@ RCT_EXPORT_METHOD(
     rejecter:(RCTPromiseRejectBlock)reject) {
     __block NSNumber * foundCookies = @NO;
     NSMutableArray<NSHTTPCookie *> * foundCookiesList = [NSMutableArray new];
-    
+
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
@@ -260,15 +260,15 @@ RCT_EXPORT_METHOD(
     props:(NSDictionary *)props
 {
     NSString *topLevelDomain = url.host;
-    
-    if (isEmpty(url.host)){
+
+    if (isEmpty(topLevelDomain)){
         NSException* myException = [NSException
             exceptionWithName:@"Exception"
             reason:INVALID_URL_MISSING_HTTP
             userInfo:nil];
         @throw myException;
     }
-    
+
     NSString *name = [RCTConvert NSString:props[@"name"]];
     NSString *value = [RCTConvert NSString:props[@"value"]];
     NSString *path = [RCTConvert NSString:props[@"path"]];
@@ -281,18 +281,21 @@ RCT_EXPORT_METHOD(
     NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
     [cookieProperties setObject:name forKey:NSHTTPCookieName];
     [cookieProperties setObject:value forKey:NSHTTPCookieValue];
-    
+
+    if (!isEmpty(path)) {
+        [cookieProperties setObject:path forKey:NSHTTPCookiePath];
+    } else {
+        [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
+    }
     if (!isEmpty(domain)) {
-        //Adding a leading . to match android behaviour of always including subdomains
-        if(![domain hasPrefix:@"."]) {
-            domain = [NSString stringWithFormat:@".%@", domain];
+        // Stripping the leading . to ensure the following check is accurate
+        NSString *strippedDomain = domain;
+         if ([strippedDomain hasPrefix:@"."]) {
+            strippedDomain = [strippedDomain substringFromIndex:1];
         }
 
-        //stripping the leading . to ensure the following check is accurate
-        NSString *strippedDomain = [domain substringFromIndex:1];
-
         if (![topLevelDomain containsString:strippedDomain] &&
-            ![strippedDomain isEqualToString: topLevelDomain]) {
+            ![topLevelDomain isEqualToString: strippedDomain]) {
                 NSException* myException = [NSException
                     exceptionWithName:@"Exception"
                     reason: [NSString stringWithFormat:INVALID_DOMAINS, topLevelDomain, domain]
@@ -302,15 +305,8 @@ RCT_EXPORT_METHOD(
 
         [cookieProperties setObject:domain forKey:NSHTTPCookieDomain];
     } else {
-        [cookieProperties setObject:url.host forKey:NSHTTPCookieDomain];
+        [cookieProperties setObject:topLevelDomain forKey:NSHTTPCookieDomain];
     }
-
-    if (!isEmpty(path)) {
-        [cookieProperties setObject:path forKey:NSHTTPCookiePath];
-    } else {
-        [cookieProperties setObject:@"/" forKey:NSHTTPCookiePath];
-    }
-
     if (!isEmpty(version)) {
          [cookieProperties setObject:version forKey:NSHTTPCookieVersion];
     }
@@ -318,10 +314,10 @@ RCT_EXPORT_METHOD(
          [cookieProperties setObject:expires forKey:NSHTTPCookieExpires];
     }
     if (!isEmpty(secure)) {
-        [cookieProperties setObject:secure forKey:@"secure"];     
+        [cookieProperties setObject:secure forKey:@"secure"];
     }
     if (!isEmpty(httpOnly)) {
-        [cookieProperties setObject:httpOnly forKey:@"HTTPOnly"];     
+        [cookieProperties setObject:httpOnly forKey:@"HTTPOnly"];
     }
 
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
