@@ -1,4 +1,4 @@
-declare module '@react-native-community/cookies' {
+declare module '@react-native-cookies/cookies' {
   export interface Cookie {
     name: string;
     value: string;
