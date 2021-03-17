@@ -22,6 +22,8 @@ declare module '@react-native-cookies/cookies' {
     getFromResponse(url: string): Promise<Cookies>;
 
     clearAll(useWebKit?: boolean): Promise<boolean>;
+    
+    flush(): Promise<void>;
 
     //iOS only
     getAll(useWebKit?: boolean): Promise<Cookies>;
