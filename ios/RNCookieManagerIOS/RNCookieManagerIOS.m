@@ -54,7 +54,7 @@ RCT_EXPORT_METHOD(
         cookie = [self makeHTTPCookieObject:url props:props];
     }
     @catch ( NSException *e ) {
-        reject(@"", [e reason], e);
+        reject(@"", [e reason], nil);
         return;
     }
 
