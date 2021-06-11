@@ -43,14 +43,21 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     private static final String CLEAR_BY_NAME_NOT_SUPPORTED = "Cannot remove a single cookie by name on Android";
     private static final String INVALID_DOMAINS = "Cookie URL host %s and domain %s mismatched. The cookie won't set correctly.";
 
-    private CookieManager mCookieManager;
     private CookieSyncManager mCookieSyncManager;
 
     CookieManagerModule(ReactApplicationContext context) {
         super(context);
         this.mCookieSyncManager = CookieSyncManager.createInstance(context);
-        this.mCookieManager = CookieManager.getInstance();
-        mCookieManager.setAcceptCookie(true);
+    }
+
+    private CookieManager getCookieManager() throws Exception {
+        try {
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.setAcceptCookie(true);
+            return cookieManager;
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
     public String getName() {
@@ -88,7 +95,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void flush(Promise promise) {
         try {
-            mCookieManager.flush();
+            getCookieManager().flush();
             promise.resolve(true);
         } catch (Exception e) {
             promise.reject(e);
@@ -112,7 +119,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             return;
         }
         try {
-            String cookiesString = mCookieManager.getCookie(url);
+            String cookiesString = getCookieManager().getCookie(url);
 
             WritableMap cookieMap = createCookieList(cookiesString);
             promise.resolve(cookieMap);
@@ -128,36 +135,42 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearAll(Boolean useWebKit, final Promise promise) {
-        if (USES_LEGACY_STORE) {
-            mCookieManager.removeAllCookie();
-            mCookieManager.removeSessionCookie();
-            mCookieSyncManager.sync();
-            promise.resolve(true);
-        } else {
-            mCookieManager.removeAllCookies(new ValueCallback<Boolean>() {
-                @Override
-                public void onReceiveValue(Boolean value) {
-                    promise.resolve(value);
-                }
-            });
-            mCookieManager.flush();
-        }
-    }
-
-    private void addCookies(String url, String cookieString, final Promise promise) {
         try {
+            CookieManager cookieManager = getCookieManager();
             if (USES_LEGACY_STORE) {
-                mCookieManager.setCookie(url, cookieString);
+                cookieManager.removeAllCookie();
+                cookieManager.removeSessionCookie();
                 mCookieSyncManager.sync();
                 promise.resolve(true);
             } else {
-                mCookieManager.setCookie(url, cookieString, new ValueCallback<Boolean>() {
+                cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
                     @Override
                     public void onReceiveValue(Boolean value) {
                         promise.resolve(value);
                     }
                 });
-                mCookieManager.flush();
+                cookieManager.flush();
+            }
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    private void addCookies(String url, String cookieString, final Promise promise) {
+        try {
+            CookieManager cookieManager = getCookieManager();
+            if (USES_LEGACY_STORE) {
+                cookieManager.setCookie(url, cookieString);
+                mCookieSyncManager.sync();
+                promise.resolve(true);
+            } else {
+                cookieManager.setCookie(url, cookieString, new ValueCallback<Boolean>() {
+                    @Override
+                    public void onReceiveValue(Boolean value) {
+                        promise.resolve(value);
+                    }
+                });
+                cookieManager.flush();
             }
         } catch (Exception e) {
             promise.reject(e);
