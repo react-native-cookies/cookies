@@ -313,11 +313,11 @@ RCT_EXPORT_METHOD(
     if (!isEmpty(expires)) {
          [cookieProperties setObject:expires forKey:NSHTTPCookieExpires];
     }
-    if (!isEmpty(secure)) {
-        [cookieProperties setObject:secure forKey:@"secure"];
+    if ([secure boolValue]) {
+        [cookieProperties setObject:secure forKey:NSHTTPCookieSecure];
     }
-    if (!isEmpty(httpOnly)) {
-        [cookieProperties setObject:httpOnly forKey:@"HTTPOnly"];
+    if ([httpOnly boolValue]) {
+        [cookieProperties setObject:httpOnly forKey:@"HttpOnly"];
     }
 
     NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieProperties];
