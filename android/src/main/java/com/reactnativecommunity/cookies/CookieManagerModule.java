@@ -83,7 +83,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setFromResponse(String url, String cookie, final Promise promise) {
+    public void setFromResponse(String url, String cookie, Boolean useWebKit, final Promise promise) {
         if (cookie == null) {
             promise.reject(new Exception(INVALID_COOKIE_VALUES));
             return;
@@ -103,7 +103,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getFromResponse(String url, Promise promise) throws URISyntaxException, IOException {
+    public void getFromResponse(String url, Boolean useWebKit, Promise promise) throws URISyntaxException, IOException {
         promise.resolve(url);
     }
 

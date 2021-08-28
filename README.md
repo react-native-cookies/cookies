@@ -9,6 +9,7 @@ Cookie Manager for React Native
 This module was ported from [joeferraro/react-native-cookies](https://github.com/joeferraro/react-native-cookies). This would not exist without the work of the original author, [Joe Ferraro](https://github.com/joeferraro).
 
 ## Important notices & Breaking Changes
+
 - **v6.0.0**: Package name updated to `@react-native-cookies/cookies`.
 - **v5.0.0**: Peer Dependency of >= React Native 0.60.2
 - **v4.0.0**: Android SDK version bumpted to 21
@@ -131,13 +132,15 @@ To use WebKit-Support, you should be able to simply make advantage of the react-
 
 To use this _CookieManager_ with WebKit-Support we extended the interface with the attribute `useWebKit` (a boolean value, default: `FALSE`) for the following methods:
 
-| Method      | WebKit-Support | Method-Signature                                                         |
-| ----------- | -------------- | ------------------------------------------------------------------------ |
-| getAll      | Yes            | `CookieManager.getAll(useWebKit:boolean)`                                |
-| clearAll    | Yes            | `CookieManager.clearAll(useWebKit:boolean)`                              |
-| clearByName | Yes            | `CookieManager.clearByName(url:string, name: string, useWebKit:boolean)` |
-| get         | Yes            | `CookieManager.get(url:string, useWebKit:boolean)`                       |
-| set         | Yes            | `CookieManager.set(url:string, cookie:object, useWebKit:boolean)`        |
+| Method          | WebKit-Support | Method-Signature                                                              |
+| --------------- | -------------- | ----------------------------------------------------------------------------- |
+| getAll          | Yes            | `CookieManager.getAll(useWebKit:boolean)`                                     |
+| clearAll        | Yes            | `CookieManager.clearAll(useWebKit:boolean)`                                   |
+| clearByName     | Yes            | `CookieManager.clearByName(url:string, name: string, useWebKit:boolean)`      |
+| get             | Yes            | `CookieManager.get(url:string, useWebKit:boolean)`                            |
+| getFromResponse | Yes            | `CookieManager.getFromResponse(url:string, useWebKit:boolean)`                |
+| set             | Yes            | `CookieManager.set(url:string, cookie:object, useWebKit:boolean)`             |
+| setFromResponse | Yes            | `CookieManager.setFromResponse(url:string, cookie:object, useWebKit:boolean)` |
 
 ##### Usage
 
@@ -170,6 +173,12 @@ CookieManager.get('http://example.com', useWebKit)
 		console.log('CookieManager.get from webkit-view =>', cookies);
 	});
 
+// Get cookies as a request header string
+CookieManager.getFromResponse('http://example.com', useWebKit)
+	.then((cookies) => {
+		console.log('CookieManager.getFromResponse from webkit-view =>', cookies);
+	});
+
 // set a cookie
 const newCookie: = {
 	name: 'myCookie',
@@ -180,8 +189,21 @@ const newCookie: = {
 	expires: '2015-05-30T12:30:00.00-05:00'
 };
 
+// set a cookie
 CookieManager.set('http://example.com', newCookie, useWebKit)
 	.then((res) => {
 		console.log('CookieManager.set from webkit-view =>', res);
 	});
+
+// Set cookies from a response header
+// This allows you to put the full string provided by a server's Set-Cookie
+// response header directly into the cookie store.
+CookieManager.setFromResponse(
+  'http://example.com',
+  'user_session=abcdefg; path=/; expires=Thu, 1 Jan 2030 00:00:00 -0000; secure; HttpOnly',
+  useWebKit)
+    .then((success) => {
+      console.log('CookieManager.setFromResponse from webkit-view =>', success);
+    });
+
 ```

@@ -78,16 +78,33 @@ RCT_EXPORT_METHOD(
 RCT_EXPORT_METHOD(
     setFromResponse:(NSURL *)url
     cookie:(NSString *)cookie
+	useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
 
     NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:@{@"Set-Cookie": cookie} forURL:url];
-    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:nil];
-    resolve(@(YES));
+    if (useWebKit) {
+        if (@available(iOS 11.0, *)) {
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                for (NSHTTPCookie* cookie in cookies)
+                {
+                    [cookieStore setCookie:cookie completionHandler:nil];
+                }
+                resolve(@(YES));
+            });
+        } else {
+            reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+        }
+    } else {
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookies:cookies forURL:url mainDocumentURL:nil];
+        resolve(@(YES));
+    }
 }
 
 RCT_EXPORT_METHOD(
     getFromResponse:(NSURL *)url
+    useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject) {
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -96,14 +113,31 @@ RCT_EXPORT_METHOD(
 
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
         NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:httpResponse.allHeaderFields forURL:response.URL];
-        NSMutableDictionary *dics = [NSMutableDictionary dictionary];
-
-        for (int i = 0; i < cookies.count; i++) {
-            NSHTTPCookie *cookie = [cookies objectAtIndex:i];
-            [dics setObject:cookie.value forKey:cookie.name];
-            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
-        }
-        resolve(dics);
+        
+        if (useWebKit) {
+            if (@available(iOS 11.0, *)) {
+                dispatch_async(dispatch_get_main_queue(), ^(){
+                    NSMutableDictionary *dics = [NSMutableDictionary dictionary];
+                    WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
+                    for (int i = 0; i < cookies.count; i++) {
+                        NSHTTPCookie *cookie = [cookies objectAtIndex:i];
+                        [dics setObject:cookie.value forKey:cookie.name];
+                        [cookieStore setCookie:cookie completionHandler:nil];
+                    }
+                    resolve(dics);
+                });
+            } else {
+                reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
+            }
+        } else {
+            NSMutableDictionary *dics = [NSMutableDictionary dictionary];
+            for (int i = 0; i < cookies.count; i++) {
+                NSHTTPCookie *cookie = [cookies objectAtIndex:i];
+                [dics setObject:cookie.value forKey:cookie.name];
+                [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            }
+            resolve(dics);
+         }
     }];
 }
 
