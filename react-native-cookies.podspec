@@ -11,8 +11,9 @@ Pod::Spec.new do |s|
   s.author              = { package["author"]["name"] => package["author"]["email"] }
   s.source              = { :git => "git@github.com:react-native-community/cookies.git", :tag => "v#{s.version}" }
   s.requires_arc        = true
-  s.platform            = :ios, "7.0"
+  s.platforms           = { :ios => "7.0", :osx => "10.2" }
   s.preserve_paths      = "*.framework"
-  s.source_files        = "ios/**/*.{h,m}"
+  s.ios.source_files    = "ios/**/*.{h,m}"
+  s.osx.source_files    = "macos/**/*.{h,m,mm,swift}"
   s.dependency "React-Core"
 end
