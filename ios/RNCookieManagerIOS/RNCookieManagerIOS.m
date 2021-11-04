@@ -48,8 +48,14 @@ RCT_EXPORT_METHOD(
     resolver:(RCTPromiseResolveBlock)resolve
     rejecter:(RCTPromiseRejectBlock)reject)
 {
-    
-    NSHTTPCookie *cookie = [self makeHTTPCookieObject:url props:props];
+    NSHTTPCookie *cookie;
+    @try {
+        cookie = [self makeHTTPCookieObject:url props:props];
+    }
+    @catch ( NSException *e ) {
+        reject(@"", [e reason], nil);
+        return;
+    }
 
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
