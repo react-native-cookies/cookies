@@ -1,11 +1,11 @@
 {
-  "name": "@react-native-community/cookies",
+  "name": "@fanduel/cookies",
   "version": "fd2.1.2",
   "description": "Cookie Manager for React Native",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/react-native-community/cookies.git",
-    "baseUrl": "https://github.com/react-native-community/cookies"
+    "url": "git+https://github.com/fanduel/cookies.git",
+    "baseUrl": "https://github.com/fanduel/cookies"
   },
   "keywords": [
     "react native",
@@ -23,9 +23,9 @@
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "bugs": {
-    "url": "https://github.com/react-native-community/cookies/issues"
+    "url": "https://github.com/fanduel/cookies/issues"
   },
-  "homepage": "https://github.com/react-native-community/cookies#readme",
+  "homepage": "https://github.com/fanduel/cookies#readme",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
