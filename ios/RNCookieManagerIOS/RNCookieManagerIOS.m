@@ -6,11 +6,7 @@
   */
 
 #import "RNCookieManagerIOS.h"
-#if __has_include("RCTConvert.h")
-#import "RCTConvert.h"
-#else
 #import <React/RCTConvert.h>
-#endif
 
 static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with iOS11 and higher!";
 static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: It may be missing a protocol (ex. http:// or https://).";
