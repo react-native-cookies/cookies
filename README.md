@@ -17,7 +17,7 @@ This module was ported from [joeferraro/react-native-cookies](https://github.com
 
 ## Maintainers
 
-- [Jason Safaiyeh](https://github.com/safaiyeh) ([Twitter @safaiyeh](https://twitter.com/safaiyeh)) from [Sumo Logic](https://www.sumologic.com)
+- [Jason Safaiyeh](https://github.com/safaiyeh) ([Twitter @safaiyeh](https://twitter.com/safaiyeh)) from [🪄 Magic Eden](https://magiceden.io)
 
 ## Platforms Supported
 
