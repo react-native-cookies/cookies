@@ -103,6 +103,20 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void removeSessionCookies(Promise promise) {
+        try {
+            getCookieManager().removeSessionCookies(new ValueCallback<Boolean>() {
+                @Override
+                public void onReceiveValue(Boolean data) {
+                    promise.resolve(data);
+                }
+            });
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void getFromResponse(String url, Promise promise) throws URISyntaxException, IOException {
         promise.resolve(url);
     }
