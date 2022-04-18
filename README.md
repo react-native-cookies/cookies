@@ -117,6 +117,16 @@ CookieManager.flush()
   .then((success) => {
     console.log('CookieManager.flush =>', success);
   });
+
+// Remove session cookies (ANDROID ONLY)
+// Session cookies are cookies with no expires set. Android typically does not
+// remove these, it is up to the developer to decide when to remove them.
+// The return value is true if any session cookies were removed.
+// iOS handles removal of session cookies automatically on app open.
+CookieManager.removeSessionCookies()
+  .then((sessionCookiesRemoved) => {
+    console.log('CookieManager.removeSessionCookies =>', sessionCookiesRemoved);
+  });
 ```
 
 ### WebKit-Support (iOS only)
