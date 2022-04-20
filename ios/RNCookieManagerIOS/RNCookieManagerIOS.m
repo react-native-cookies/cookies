@@ -195,7 +195,7 @@ RCT_EXPORT_METHOD(
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
                     for (NSHTTPCookie *cookie in allCookies) {
-                        if ([name isEqualToString:cookie.name]) {
+                        if ([name isEqualToString:cookie.name] && [self isMatchingDomain:topLevelDomain cookieDomain:cookie.domain]) {
                              [foundCookiesList addObject:cookie];
                              foundCookies = @YES;
                         }
@@ -212,7 +212,7 @@ RCT_EXPORT_METHOD(
     } else {
            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
            for (NSHTTPCookie *c in cookieStorage.cookies) {
-               if ([[c name] isEqualToString:name]) {
+               if ([[c name] isEqualToString:name] && [self isMatchingDomain:url.host cookieDomain:c.domain]) {
                    [cookieStorage deleteCookie:c];
                    foundCookies = @YES;
                }
@@ -335,6 +335,16 @@ RCT_EXPORT_METHOD(
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.secure] forKey:@"secure"];
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.HTTPOnly] forKey:@"httpOnly"];
     return cookieData;
+}
+
+-(BOOL)isMatchingDomain:(NSString *)originDomain
+      cookieDomain:(NSString *)cookieDomain
+{
+    if ([originDomain isEqualToString: cookieDomain]) {
+        return @YES;
+    }
+    NSString *parentDomain = [cookieDomain hasPrefix:@"."] ? cookieDomain : [@"." stringByAppendingString: cookieDomain];
+    return [originDomain hasSuffix:parentDomain];
 }
 
 @end
