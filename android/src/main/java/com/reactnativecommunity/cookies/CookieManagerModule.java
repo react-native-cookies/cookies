@@ -103,7 +103,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void removeSessionCookies(Promise promise) {
+    public void removeSessionCookies(final Promise promise) {
         try {
             getCookieManager().removeSessionCookies(new ValueCallback<Boolean>() {
                 @Override
