@@ -153,7 +153,8 @@ RCT_EXPORT_METHOD(
             dispatch_async(dispatch_get_main_queue(), ^(){
                 [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes
                                                              completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
-                    [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:WKWebsiteDataStore.allWebsiteDataTypes
+                    NSSet *cookieDataType = [NSSet setWithArray:@[ WKWebsiteDataTypeCookies ]];
+                    [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:cookieDataType
                                                               forDataRecords:records
                                                            completionHandler:^{
                                                               resolve(@(YES));
