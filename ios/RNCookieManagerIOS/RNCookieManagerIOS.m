@@ -151,7 +151,8 @@ RCT_EXPORT_METHOD(
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
-                [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:WKWebsiteDataStore.allWebsiteDataTypes
+                NSSet *dataTypesToRetrieve = [NSSet setWithArray:@[ WKWebsiteDataTypeCookies ]];
+                [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:dataTypesToRetrieve
                                                              completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
                     NSSet *cookieDataType = [NSSet setWithArray:@[ WKWebsiteDataTypeCookies ]];
                     [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:cookieDataType
