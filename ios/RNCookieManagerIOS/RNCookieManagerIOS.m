@@ -151,14 +151,17 @@ RCT_EXPORT_METHOD(
     if (useWebKit) {
         if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
-                // https://stackoverflow.com/questions/46465070/how-to-delete-cookies-from-wkhttpcookiestore#answer-47928399
-                NSSet *websiteDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeCookies]];
-                NSDate *dateFrom = [NSDate dateWithTimeIntervalSince1970:0];
-                [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:websiteDataTypes
-                                                        modifiedSince:dateFrom
-                                                        completionHandler:^() {
-                                                            resolve(@(YES));
-                                                        }];
+                NSSet *dataTypesToRetrieve = [NSSet setWithArray:@[ WKWebsiteDataTypeCookies ]];
+                [[WKWebsiteDataStore defaultDataStore] fetchDataRecordsOfTypes:dataTypesToRetrieve
+                                                             completionHandler:^(NSArray<WKWebsiteDataRecord *> * _Nonnull records) {
+                    NSSet *cookieDataType = [NSSet setWithArray:@[ WKWebsiteDataTypeCookies ]];
+                    [[WKWebsiteDataStore defaultDataStore] removeDataOfTypes:cookieDataType
+                                                              forDataRecords:records
+                                                           completionHandler:^{
+                                                              resolve(@(YES));
+                                                           }
+                    ];
+                }];
             });
         } else {
             reject(@"", NOT_AVAILABLE_ERROR_MESSAGE, nil);
