@@ -21,15 +21,14 @@ This module was ported from [joeferraro/react-native-cookies](https://github.com
 
 ## Platforms Supported
 
-✅ iOS  
-✅ Android  
-
-Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
+- ✅ iOS
+- ✅ Android
+- ❌ Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
 
 ## Expo
 
-✅ You can use this library with [Development Builds](https://docs.expo.dev/development/introduction/). No config plugin is required.
-❌ This library can't be used in the "Expo Go" app because it [requires custom native code](https://docs.expo.dev/workflow/customizing/).
+- ✅ You can use this library with [Development Builds](https://docs.expo.dev/development/introduction/). No config plugin is required.
+- ❌ This library can't be used in the "Expo Go" app because it [requires custom native code](https://docs.expo.dev/workflow/customizing/).
 
 ## Installation
 
