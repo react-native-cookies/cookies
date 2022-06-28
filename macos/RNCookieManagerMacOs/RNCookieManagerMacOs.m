@@ -6,13 +6,9 @@
   */
 
 #import "RNCookieManagerMacOS.h"
-#if __has_include("RCTConvert.h")
-#import "RCTConvert.h"
-#else
 #import <React/RCTConvert.h>
-#endif
 
-static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with macOS 10.2 and higher!";
+static NSString * const NOT_AVAILABLE_ERROR_MESSAGE = @"WebKit/WebKit-Components are only available with macOS 10.13 and higher!";
 static NSString * const INVALID_URL_MISSING_HTTP = @"Invalid URL: It may be missing a protocol (ex. http:// or https://).";
 static NSString * const INVALID_DOMAINS = @"Cookie URL host %@ and domain %@ mismatched. The cookie won't set correctly.";
 
@@ -47,7 +43,8 @@ RCT_EXPORT_METHOD(
     cookie:(NSDictionary *)props
     useWebKit:(BOOL)useWebKit
     resolver:(RCTPromiseResolveBlock)resolve
-    rejecter:(RCTPromiseRejectBlock)reject) {
+    rejecter:(RCTPromiseRejectBlock)reject)
+{
     NSHTTPCookie *cookie;
     @try {
         cookie = [self makeHTTPCookieObject:url props:props];
@@ -58,7 +55,7 @@ RCT_EXPORT_METHOD(
     }
 
     if (useWebKit) {
-        if (@available(macOS 10.2, *)) {
+        if (@available(macOS 10.13, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore setCookie:cookie completionHandler:^() {
@@ -113,7 +110,7 @@ RCT_EXPORT_METHOD(
     rejecter:(RCTPromiseRejectBlock)reject)
 {
     if (useWebKit) {
-        if (@available(macOS 10.2, *)) {
+        if (@available(macOS 10.13, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = url.host;
 
@@ -152,7 +149,7 @@ RCT_EXPORT_METHOD(
     rejecter:(RCTPromiseRejectBlock)reject)
 {
     if (useWebKit) {
-        if (@available(macOS 10.2, *)) {
+        if (@available(macOS 10.13, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 // https://stackoverflow.com/questions/46465070/how-to-delete-cookies-from-wkhttpcookiestore#answer-47928399
                 NSSet *websiteDataTypes = [NSSet setWithArray:@[WKWebsiteDataTypeCookies]];
@@ -186,7 +183,7 @@ RCT_EXPORT_METHOD(
     NSMutableArray<NSHTTPCookie *> * foundCookiesList = [NSMutableArray new];
 
     if (useWebKit) {
-        if (@available(macOS 10.2, *)) {
+        if (@available(macOS 10.13, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = url.host;
 
@@ -230,7 +227,7 @@ RCT_EXPORT_METHOD(
     rejecter:(RCTPromiseRejectBlock)reject)
 {
     if (useWebKit) {
-        if (@available(macOS 10.2, *)) {
+        if (@available(macOS 10.13, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 WKHTTPCookieStore *cookieStore = [[WKWebsiteDataStore defaultDataStore] httpCookieStore];
                 [cookieStore getAllCookies:^(NSArray<NSHTTPCookie *> *allCookies) {
@@ -338,6 +335,16 @@ RCT_EXPORT_METHOD(
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.secure] forKey:@"secure"];
     [cookieData setObject:[NSNumber numberWithBool:(BOOL)cookie.HTTPOnly] forKey:@"httpOnly"];
     return cookieData;
+}
+
+-(BOOL)isMatchingDomain:(NSString *)originDomain
+      cookieDomain:(NSString *)cookieDomain
+{
+    if ([originDomain isEqualToString: cookieDomain]) {
+        return @YES;
+    }
+    NSString *parentDomain = [cookieDomain hasPrefix:@"."] ? cookieDomain : [@"." stringByAppendingString: cookieDomain];
+    return [originDomain hasSuffix:parentDomain];
 }
 
 @end
