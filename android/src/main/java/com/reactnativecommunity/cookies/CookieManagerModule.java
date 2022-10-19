@@ -12,6 +12,7 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
+import android.webkit.WebStorage;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -165,6 +166,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                 });
                 cookieManager.flush();
             }
+            WebStorage.getInstance().deleteAllData();
         } catch (Exception e) {
             promise.reject(e);
         }
