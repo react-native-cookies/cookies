@@ -115,7 +115,7 @@ RCT_EXPORT_METHOD(
 {
     if (useWebKit) {
 #if __has_include(<WebKit/WebKit.h>)
-        if (@available(iOS 11.0, *) && __has_include("<WebKit/WebKit.h>")) {
+        if (@available(iOS 11.0, *)) {
             dispatch_async(dispatch_get_main_queue(), ^(){
                 NSString *topLevelDomain = url.host;
 
