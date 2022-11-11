@@ -22,7 +22,9 @@ This module was ported from [joeferraro/react-native-cookies](https://github.com
 ## Platforms Supported
 
 - ✅ iOS
+- ✅ tvOS
 - ✅ Android
+- ✅ AndroidTV
 - ❌ Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
 
 ## Expo
