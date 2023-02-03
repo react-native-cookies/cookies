@@ -12,6 +12,7 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
+import android.webkit.WebStorage;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -151,9 +152,11 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void clearAll(Boolean useWebKit, final Promise promise) {
         try {
             CookieManager cookieManager = getCookieManager();
+            WebStorage webStorage = WebStorage.getInstance();
             if (USES_LEGACY_STORE) {
                 cookieManager.removeAllCookie();
                 cookieManager.removeSessionCookie();
+                webStorage.deleteAllData();
                 mCookieSyncManager.sync();
                 promise.resolve(true);
             } else {
@@ -164,6 +167,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
                     }
                 });
                 cookieManager.flush();
+                webStorage.deleteAllData();
             }
         } catch (Exception e) {
             promise.reject(e);
