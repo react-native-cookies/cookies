@@ -115,11 +115,8 @@ CookieManager.clearByName('http://example.com', 'cookie_name')
     console.log('CookieManager.clearByName =>', success);
   });
 
-// flush cookies (ANDROID ONLY)
+// flush cookies (ANDROID ONLY https://developer.android.com/reference/android/webkit/CookieManager#flush() )
 CookieManager.flush()
-  .then((success) => {
-    console.log('CookieManager.flush =>', success);
-  });
 
 // Remove session cookies (ANDROID ONLY)
 // Session cookies are cookies with no expires set. Android typically does not
