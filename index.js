@@ -53,6 +53,11 @@ module.exports = {
       await CookieManager.flush();
     }
   },
+  removeSessionCookies: async () => {
+    if (Platform.OS === 'android') {
+      return await CookieManager.removeSessionCookies();
+    }
+  },
 };
 
 for (var i = 0; i < functions.length; i++) {

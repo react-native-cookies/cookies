@@ -17,15 +17,18 @@ This module was ported from [joeferraro/react-native-cookies](https://github.com
 
 ## Maintainers
 
-- [Jason Safaiyeh](https://github.com/safaiyeh) ([Twitter @safaiyeh](https://twitter.com/safaiyeh)) from [Sumo Logic](https://www.sumologic.com)
+- [Jason Safaiyeh](https://github.com/safaiyeh) ([Twitter @safaiyeh](https://twitter.com/safaiyeh)) from [🪄 Magic Eden](https://magiceden.io)
 
 ## Platforms Supported
 
-✅ iOS  
-✅ Android  
-❌ Expo is working on their own cookie support (https://github.com/expo/expo/issues/6756)
+- ✅ iOS
+- ✅ Android
+- ❌ Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
 
-Currently lacking support for Windows, macOS, and web. Support for these platforms will be created when there is a need for them. Starts with a posted issue.
+## Expo
+
+- ✅ You can use this library with [Development Builds](https://docs.expo.dev/development/introduction/). No config plugin is required.
+- ❌ This library can't be used in the "Expo Go" app because it [requires custom native code](https://docs.expo.dev/workflow/customizing/).
 
 ## Installation
 
@@ -116,6 +119,16 @@ CookieManager.clearByName('http://example.com', 'cookie_name')
 CookieManager.flush()
   .then((success) => {
     console.log('CookieManager.flush =>', success);
+  });
+
+// Remove session cookies (ANDROID ONLY)
+// Session cookies are cookies with no expires set. Android typically does not
+// remove these, it is up to the developer to decide when to remove them.
+// The return value is true if any session cookies were removed.
+// iOS handles removal of session cookies automatically on app open.
+CookieManager.removeSessionCookies()
+  .then((sessionCookiesRemoved) => {
+    console.log('CookieManager.removeSessionCookies =>', sessionCookiesRemoved);
   });
 ```
 
