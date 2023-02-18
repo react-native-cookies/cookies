@@ -13,11 +13,13 @@
     "android",
     "ios",
     "cookies",
-    "webview"
+    "webview",
+    "macos"
   ],
   "files": [
     "android",
     "ios",
+    "macos",
     "index.d.ts",
     "react-native-cookies.podspec"
   ],

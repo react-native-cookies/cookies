@@ -9,6 +9,7 @@ import { NativeModules, Platform } from 'react-native';
 const invariant = require('invariant');
 const RNCookieManagerIOS = NativeModules.RNCookieManagerIOS;
 const RNCookieManagerAndroid = NativeModules.RNCookieManagerAndroid;
+const RNCookieManagerMacOS = NativeModules.RNCookieManagerMacOS;
 
 let CookieManager;
 
@@ -24,10 +25,16 @@ if (Platform.OS === 'ios') {
     '@react-native-community/cookies: Import libraries to android "react-native link @react-native-community/cookies"',
   );
   CookieManager = RNCookieManagerAndroid;
+} else if (Platform.OS === 'macos') {
+  invariant(
+    RNCookieManagerMacOS,
+    '@react-native-community/cookies: Add RNCookieManagerMacOS.h and RNCookieManagerMacOS.m to your Xcode project',
+  );
+  CookieManager = RNCookieManagerMacOS;
 } else {
   invariant(
     CookieManager,
-    '@react-native-community/cookies: Invalid platform. This library only supports Android and iOS.',
+    '@react-native-community/cookies: Invalid platform. This library only supports Android, iOS and MacOS.',
   );
 }
 
