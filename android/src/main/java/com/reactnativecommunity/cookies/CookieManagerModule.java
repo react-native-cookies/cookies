@@ -244,8 +244,6 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
             }
 
             cookieBuilder.setDomain(domain);
-        } else {
-            cookieBuilder.setDomain(topLevelDomain);
         }
 
         // unlike iOS, Android will handle no path gracefully and assume "/""
