@@ -68,7 +68,8 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
     public void set(String url, ReadableMap cookie, Boolean useWebKit, final Promise promise) {
         String cookieString = null;
         try {
-            cookieString = toRFC6265string(makeHTTPCookieObject(url, cookie));
+            String sameSite = cookie.getString("sameSite");
+            cookieString = toRFC6265string(makeHTTPCookieObject(url, cookie), sameSite);
         } catch (Exception e) {
             promise.reject(e);
             return;
@@ -273,7 +274,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return cookieBuilder;
     }
 
-    private WritableMap createCookieData(HttpCookie cookie) {
+    private WritableMap createCookieData(HttpCookie cookie, String sameSite) {
         WritableMap cookieMap = Arguments.createMap();
         cookieMap.putString("name", cookie.getName());
         cookieMap.putString("value", cookie.getValue());
@@ -301,7 +302,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
      * For our purposes RFC 6265 is the right way to go.
      * This is a convenience method to give us the right formatting.
      */
-    private String toRFC6265string(HttpCookie cookie) {
+    private String toRFC6265string(HttpCookie cookie, String sameSite) {
         StringBuilder builder = new StringBuilder();
 
         builder.append(cookie.getName())
@@ -334,6 +335,10 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
 
         if (HTTP_ONLY_SUPPORTED && cookie.isHttpOnly()) {
             builder.append("; httponly");
+        }
+
+        if (sameSite != null) {
+            builder.append("; samesite=").append(sameSite);
         }
 
         return builder.toString();
