@@ -274,7 +274,7 @@ public class CookieManagerModule extends ReactContextBaseJavaModule {
         return cookieBuilder;
     }
 
-    private WritableMap createCookieData(HttpCookie cookie, String sameSite) {
+    private WritableMap createCookieData(HttpCookie cookie) {
         WritableMap cookieMap = Arguments.createMap();
         cookieMap.putString("name", cookie.getName());
         cookieMap.putString("value", cookie.getValue());
