@@ -1,3 +1,11 @@
+> ⚠️ **This package is deprecated and archived.**
+>
+> Please use one of these actively maintained alternatives:
+> - [`@preeternal/react-native-cookie-manager`](https://github.com/nickkuijpers/react-native-cookie-manager) — TurboModule rewrite
+> - [`react-native-nitro-cookies`](https://github.com/l2hyunwoo/react-native-nitro-cookies) — Nitro-based
+
+---
+
 # React Native Cookies - A Cookie Manager for React Native
 
 Cookie Manager for React Native
